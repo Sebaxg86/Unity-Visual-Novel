@@ -32,6 +32,8 @@ namespace EntreTuSilencio.Dialogue
 
         public bool IsTyping { get; private set; }
         public DialogueLine CurrentLine => currentIndex >= 0 && currentIndex < activeLines.Count ? activeLines[currentIndex] : null;
+        public Sprite LeftPortraitSprite => leftPortraitImage != null ? leftPortraitImage.sprite : null;
+        public Sprite RightPortraitSprite => rightPortraitImage != null ? rightPortraitImage.sprite : null;
 
         private void Awake()
         {
