@@ -1,0 +1,1144 @@
+fileFormatVersion: 2
+guid: add9d11243dccc3428a02cad503b6d27
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1073644556809552177
+    second: Barra_de_Proteina_0
+  - first:
+      213: -753355458155118899
+    second: Barra_de_Proteina_1
+  - first:
+      213: -1503891893681610056
+    second: Barra_de_Proteina_2
+  - first:
+      213: 6632302004486087698
+    second: Barra_de_Proteina_3
+  - first:
+      213: -8644902004117080005
+    second: Barra_de_Proteina_4
+  - first:
+      213: -1225254479612142734
+    second: Barra_de_Proteina_5
+  - first:
+      213: 5017530823736630251
+    second: Barra_de_Proteina_6
+  - first:
+      213: -4373810991676445457
+    second: Barra_de_Proteina_7
+  - first:
+      213: 7318205159664601170
+    second: Barra_de_Proteina_8
+  - first:
+      213: -3105231433206464885
+    second: Barra_de_Proteina_9
+  - first:
+      213: 5344838884306591509
+    second: Barra_de_Proteina_10
+  - first:
+      213: -8642866759688078672
+    second: Barra_de_Proteina_11
+  - first:
+      213: -7412583284385475774
+    second: Barra_de_Proteina_12
+  - first:
+      213: 5147956044871955767
+    second: Barra_de_Proteina_13
+  - first:
+      213: -9013106574903814381
+    second: Barra_de_Proteina_14
+  - first:
+      213: -2713224602736412174
+    second: Barra_de_Proteina_15
+  - first:
+      213: -366195411445019363
+    second: Barra_de_Proteina_16
+  - first:
+      213: -5500513296753194613
+    second: Barra_de_Proteina_17
+  - first:
+      213: 136016641692902421
+    second: Barra_de_Proteina_18
+  - first:
+      213: 5351270319435121291
+    second: Barra_de_Proteina_19
+  - first:
+      213: -8328538545421393622
+    second: Barra_de_Proteina_20
+  - first:
+      213: 2896485550969739152
+    second: Barra_de_Proteina_21
+  - first:
+      213: 8416107705834067222
+    second: Barra_de_Proteina_22
+  - first:
+      213: 3560675818016122503
+    second: Barra_de_Proteina_23
+  - first:
+      213: -1694309678432777492
+    second: Barra_de_Proteina_24
+  - first:
+      213: -8237266777632144312
+    second: Barra_de_Proteina_25
+  - first:
+      213: -7568582726600875669
+    second: Barra_de_Proteina_26
+  - first:
+      213: -6870991906001880945
+    second: Barra_de_Proteina_27
+  - first:
+      213: -2845751619133508820
+    second: Barra_de_Proteina_28
+  - first:
+      213: 1686534022056560702
+    second: Barra_de_Proteina_29
+  - first:
+      213: -5219677663755401580
+    second: Barra_de_Proteina_30
+  - first:
+      213: -2551246366041023719
+    second: Barra_de_Proteina_31
+  - first:
+      213: 1236341542018139750
+    second: Barra_de_Proteina_32
+  - first:
+      213: 4749472888866044119
+    second: Barra_de_Proteina_33
+  - first:
+      213: 8251707717355616322
+    second: Barra_de_Proteina_34
+  - first:
+      213: 8539507725821454368
+    second: Barra_de_Proteina_35
+  - first:
+      213: -6286163202624786018
+    second: Barra_de_Proteina_36
+  - first:
+      213: -3161767661510037435
+    second: Barra_de_Proteina_37
+  - first:
+      213: -4669809950701915931
+    second: Barra_de_Proteina_38
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Barra_de_Proteina_0
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 2328
+        width: 13
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1314aa7390a56ee00800000000000000
+      internalID: 1073644556809552177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_1
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 2381
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dceff07c33b8b85f0800000000000000
+      internalID: -753355458155118899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_2
+      rect:
+        serializedVersion: 2
+        x: 669
+        y: 2371
+        width: 43
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b2a4886a4a112be0800000000000000
+      internalID: -1503891893681610056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_3
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 1069
+        width: 3444
+        height: 1309
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 214218c988baa0c50800000000000000
+      internalID: 6632302004486087698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_4
+      rect:
+        serializedVersion: 2
+        x: 2670
+        y: 2342
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b38f98e0e63270880800000000000000
+      internalID: -8644902004117080005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_5
+      rect:
+        serializedVersion: 2
+        x: 2678
+        y: 2337
+        width: 25
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27b134fda850ffee0800000000000000
+      internalID: -1225254479612142734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_6
+      rect:
+        serializedVersion: 2
+        x: 2713
+        y: 2343
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: beb156e33b9d1a540800000000000000
+      internalID: 5017530823736630251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_7
+      rect:
+        serializedVersion: 2
+        x: 2721
+        y: 2343
+        width: 22
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fec2d66931a1d43c0800000000000000
+      internalID: -4373810991676445457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_8
+      rect:
+        serializedVersion: 2
+        x: 3452
+        y: 2299
+        width: 13
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2584d37b1dc7f8560800000000000000
+      internalID: 7318205159664601170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_9
+      rect:
+        serializedVersion: 2
+        x: 3279
+        y: 2332
+        width: 13
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8ef956b67008e4d0800000000000000
+      internalID: -3105231433206464885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_10
+      rect:
+        serializedVersion: 2
+        x: 3431
+        y: 2117
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51f1ac8a5aeac2a40800000000000000
+      internalID: 5344838884306591509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_11
+      rect:
+        serializedVersion: 2
+        x: 3429
+        y: 2021
+        width: 29
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bab2c3597e5e0880800000000000000
+      internalID: -8642866759688078672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1894
+        width: 15
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2439432c6c6312990800000000000000
+      internalID: -7412583284385475774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_13
+      rect:
+        serializedVersion: 2
+        x: 3464
+        y: 1900
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 735faed6fb6317740800000000000000
+      internalID: 5147956044871955767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_14
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 1827
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 317de18d2530be280800000000000000
+      internalID: -9013106574903814381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_15
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 1844
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f9bb0e5990b85ad0800000000000000
+      internalID: -2713224602736412174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_16
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 1818
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1d0176a6330beaf0800000000000000
+      internalID: -366195411445019363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_17
+      rect:
+        serializedVersion: 2
+        x: 22
+        y: 1810
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8986b0bc404aa3b0800000000000000
+      internalID: -5500513296753194613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_18
+      rect:
+        serializedVersion: 2
+        x: 3433
+        y: 1747
+        width: 15
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 514a5ab3a6a33e100800000000000000
+      internalID: 136016641692902421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_19
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 1722
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b828507d008834a40800000000000000
+      internalID: 5351270319435121291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_20
+      rect:
+        serializedVersion: 2
+        x: 3402
+        y: 1476
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a216206c1561b6c80800000000000000
+      internalID: -8328538545421393622
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_21
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 1161
+        width: 41
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0975a9a2342623820800000000000000
+      internalID: 2896485550969739152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_22
+      rect:
+        serializedVersion: 2
+        x: 3097
+        y: 1167
+        width: 30
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 615daa53e550cc470800000000000000
+      internalID: 8416107705834067222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_23
+      rect:
+        serializedVersion: 2
+        x: 3125
+        y: 1162
+        width: 22
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 786ac2d8acf0a6130800000000000000
+      internalID: 3560675818016122503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_24
+      rect:
+        serializedVersion: 2
+        x: 3276
+        y: 1145
+        width: 37
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cea0285035a9c78e0800000000000000
+      internalID: -1694309678432777492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_25
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 1131
+        width: 12
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8440c1732895fad80800000000000000
+      internalID: -8237266777632144312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_26
+      rect:
+        serializedVersion: 2
+        x: 271
+        y: 1130
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b612cc73c1ef6f690800000000000000
+      internalID: -7568582726600875669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_27
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 1137
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f887c2cf34555a0a0800000000000000
+      internalID: -6870991906001880945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_28
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 1133
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c23fd86dafbd188d0800000000000000
+      internalID: -2845751619133508820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_29
+      rect:
+        serializedVersion: 2
+        x: 3440
+        y: 1129
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e38ca46e1c5c76710800000000000000
+      internalID: 1686534022056560702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_30
+      rect:
+        serializedVersion: 2
+        x: 237
+        y: 1128
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49681d1e1daff87b0800000000000000
+      internalID: -5219677663755401580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_31
+      rect:
+        serializedVersion: 2
+        x: 250
+        y: 1129
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91b5e9972f6289cd0800000000000000
+      internalID: -2551246366041023719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_32
+      rect:
+        serializedVersion: 2
+        x: 411
+        y: 1115
+        width: 21
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 666cc01051e582110800000000000000
+      internalID: 1236341542018139750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_33
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 1127
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d8753bbd6489e140800000000000000
+      internalID: 4749472888866044119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_34
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 1105
+        width: 15
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 248b4531374f38270800000000000000
+      internalID: 8251707717355616322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_35
+      rect:
+        serializedVersion: 2
+        x: 457
+        y: 1113
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 028aa4a480d628670800000000000000
+      internalID: 8539507725821454368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_36
+      rect:
+        serializedVersion: 2
+        x: 3115
+        y: 1106
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e91fa6b6fdf03c8a0800000000000000
+      internalID: -6286163202624786018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_37
+      rect:
+        serializedVersion: 2
+        x: 3140
+        y: 1104
+        width: 20
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 540706940152f14d0800000000000000
+      internalID: -3161767661510037435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Barra_de_Proteina_38
+      rect:
+        serializedVersion: 2
+        x: 3160
+        y: 1105
+        width: 25
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e0f3df6790813fb0800000000000000
+      internalID: -4669809950701915931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Barra_de_Proteina_0: 1073644556809552177
+      Barra_de_Proteina_1: -753355458155118899
+      Barra_de_Proteina_10: 5344838884306591509
+      Barra_de_Proteina_11: -8642866759688078672
+      Barra_de_Proteina_12: -7412583284385475774
+      Barra_de_Proteina_13: 5147956044871955767
+      Barra_de_Proteina_14: -9013106574903814381
+      Barra_de_Proteina_15: -2713224602736412174
+      Barra_de_Proteina_16: -366195411445019363
+      Barra_de_Proteina_17: -5500513296753194613
+      Barra_de_Proteina_18: 136016641692902421
+      Barra_de_Proteina_19: 5351270319435121291
+      Barra_de_Proteina_2: -1503891893681610056
+      Barra_de_Proteina_20: -8328538545421393622
+      Barra_de_Proteina_21: 2896485550969739152
+      Barra_de_Proteina_22: 8416107705834067222
+      Barra_de_Proteina_23: 3560675818016122503
+      Barra_de_Proteina_24: -1694309678432777492
+      Barra_de_Proteina_25: -8237266777632144312
+      Barra_de_Proteina_26: -7568582726600875669
+      Barra_de_Proteina_27: -6870991906001880945
+      Barra_de_Proteina_28: -2845751619133508820
+      Barra_de_Proteina_29: 1686534022056560702
+      Barra_de_Proteina_3: 6632302004486087698
+      Barra_de_Proteina_30: -5219677663755401580
+      Barra_de_Proteina_31: -2551246366041023719
+      Barra_de_Proteina_32: 1236341542018139750
+      Barra_de_Proteina_33: 4749472888866044119
+      Barra_de_Proteina_34: 8251707717355616322
+      Barra_de_Proteina_35: 8539507725821454368
+      Barra_de_Proteina_36: -6286163202624786018
+      Barra_de_Proteina_37: -3161767661510037435
+      Barra_de_Proteina_38: -4669809950701915931
+      Barra_de_Proteina_4: -8644902004117080005
+      Barra_de_Proteina_5: -1225254479612142734
+      Barra_de_Proteina_6: 5017530823736630251
+      Barra_de_Proteina_7: -4373810991676445457
+      Barra_de_Proteina_8: 7318205159664601170
+      Barra_de_Proteina_9: -3105231433206464885
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
