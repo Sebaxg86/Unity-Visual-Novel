@@ -3,6 +3,7 @@ using System.Collections;
 using EntreTuSilencio.Core;
 using EntreTuSilencio.Dialogue;
 using EntreTuSilencio.Systems;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -46,6 +47,37 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private bool useFallbackDataWhenEmpty = true;
         [SerializeField] private float firstChoiceTutorialDuration = 2.75f;
 
+        [Header("Canonical Intro")]
+        [SerializeField] private bool useCanonicalIntroSequence = true;
+        [SerializeField] private CanvasGroup introSavingCanvasGroup;
+        [SerializeField] private CanvasGroup introChapterTitleCanvasGroup;
+        [SerializeField] private CanvasGroup introMonologueCanvasGroup;
+        [SerializeField] private TMP_Text introSavingText;
+        [SerializeField] private TMP_Text introChapterNumberText;
+        [SerializeField] private TMP_Text introChapterNameText;
+        [SerializeField] private TMP_Text introMonologueText;
+        [SerializeField] private float introBlackHoldDuration = 2f;
+        [SerializeField] private float introSavingDuration = 4f;
+        [SerializeField] private float introChapterTitleDuration = 4.5f;
+        [SerializeField] private float introMonologuePauseDuration = 1.35f;
+        [SerializeField] private float introWakeRevealDuration = 0.7f;
+        [SerializeField] private float introMonologueCharactersPerSecond = 34f;
+
+        [TextArea(1, 2)]
+        [SerializeField] private string introSavingLabel = "Guardando...";
+
+        [TextArea(1, 2)]
+        [SerializeField] private string introChapterNumberLabel = "Capitulo 1";
+
+        [TextArea(1, 2)]
+        [SerializeField] private string introChapterNameLabel = "UN NUEVO COMIENZO";
+
+        [TextArea(2, 5)]
+        [SerializeField] private string introMonologueLine1 = "Uno pensaria que con los anos la vida se haria mas sencilla, que con cada dia el peso seria mas liviano, y vivir seria menos una carga.";
+
+        [TextArea(2, 3)]
+        [SerializeField] private string introMonologueLine2 = "Pero al parecer no.";
+
         [Header("Scene References")]
         [SerializeField] private Image backgroundImage;
         [SerializeField] private FadeOverlayController fadeOverlayController;
@@ -69,6 +101,18 @@ namespace EntreTuSilencio.Chapter01
         [Header("Phone")]
         [SerializeField] private Sprite firstPhoneMessage;
 
+        [Header("Audio")]
+        [SerializeField] private AudioSource musicSource;
+        [SerializeField] private AudioSource sfxSource;
+        [SerializeField] private AudioClip introMusic;
+        [SerializeField] private AudioClip roomMusic;
+        [SerializeField] private AudioClip hallwayMusic;
+        [SerializeField] private AudioClip cafeteriaMusic;
+        [SerializeField] private AudioClip phoneNotificationSfx;
+        [SerializeField] private AudioClip roomExitSfx;
+        [SerializeField] private AudioClip choiceSelectedSfx;
+        [SerializeField] private AudioClip chapterCompleteSfx;
+
         [Header("Dialogue")]
         [SerializeField] private DialogueLine[] introLines;
         [SerializeField] private DialogueLine[] roomLines;
@@ -85,6 +129,8 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private ChapterChoiceBeat thirdChoice;
 
         public Chapter01Beat CurrentBeat { get; private set; }
+
+        private Action pendingDialogueCompletion;
 
         private void OnEnable()
         {
@@ -164,6 +210,12 @@ namespace EntreTuSilencio.Chapter01
         {
             StopAllCoroutines();
             CurrentBeat = Chapter01Beat.None;
+            pendingDialogueCompletion = null;
+
+            if (dialogueController != null)
+            {
+                dialogueController.Hide();
+            }
 
             if (choiceController != null)
             {
@@ -181,6 +233,7 @@ namespace EntreTuSilencio.Chapter01
                 trustController.HideTutorial();
             }
 
+            HideCanonicalIntroVisuals();
             SetCanvasGroupState(roomExitCanvasGroup, false);
 
             StartCoroutine(BeginChapterRoutine());
@@ -196,6 +249,15 @@ namespace EntreTuSilencio.Chapter01
 
         private IEnumerator BeginChapterRoutine()
         {
+            CurrentBeat = Chapter01Beat.Intro;
+            PlayMusicIfNeeded(introMusic);
+
+            if (ShouldUseCanonicalIntroSequence())
+            {
+                yield return PlayCanonicalIntroSequence();
+                yield break;
+            }
+
             SetBackground(introBackground);
 
             if (fadeOverlayController != null)
@@ -207,6 +269,136 @@ namespace EntreTuSilencio.Chapter01
             BeginIntro();
         }
 
+        private bool ShouldUseCanonicalIntroSequence()
+        {
+            return useCanonicalIntroSequence
+                && introSavingCanvasGroup != null
+                && introChapterTitleCanvasGroup != null
+                && introMonologueCanvasGroup != null
+                && introSavingText != null
+                && introChapterNumberText != null
+                && introChapterNameText != null
+                && introMonologueText != null
+                && fadeOverlayController != null;
+        }
+
+        private IEnumerator PlayCanonicalIntroSequence()
+        {
+            ConfigureCanonicalIntroTexts();
+            SetBackground(introBackground);
+            fadeOverlayController.ShowInstant();
+
+            if (introBlackHoldDuration > 0f)
+            {
+                yield return new WaitForSecondsRealtime(introBlackHoldDuration);
+            }
+
+            yield return ShowIntroGroupRoutine(introSavingCanvasGroup, introSavingDuration);
+            yield return ShowIntroGroupRoutine(introChapterTitleCanvasGroup, introChapterTitleDuration);
+            yield return ShowIntroMonologueRoutine();
+            yield return BeginWakeIntoPhoneRoutine();
+        }
+
+        private IEnumerator ShowIntroGroupRoutine(CanvasGroup targetGroup, float visibleDuration)
+        {
+            SetCanvasGroupState(targetGroup, true);
+            yield return fadeOverlayController.PlayFadeFromBlack(openingFadeDuration);
+
+            if (visibleDuration > 0f)
+            {
+                yield return new WaitForSecondsRealtime(visibleDuration);
+            }
+
+            yield return fadeOverlayController.PlayFadeToBlack(openingFadeDuration);
+            SetCanvasGroupState(targetGroup, false);
+        }
+
+        private IEnumerator ShowIntroMonologueRoutine()
+        {
+            SetCanvasGroupState(introMonologueCanvasGroup, true);
+            introMonologueText.text = string.Empty;
+
+            yield return fadeOverlayController.PlayFadeFromBlack(openingFadeDuration);
+            yield return TypeTextRoutine(introMonologueText, introMonologueLine1, introMonologueCharactersPerSecond);
+
+            if (introMonologuePauseDuration > 0f)
+            {
+                yield return new WaitForSecondsRealtime(introMonologuePauseDuration);
+            }
+
+            introMonologueText.text += "\n\n";
+            yield return TypeTextRoutine(introMonologueText, introMonologueLine2, introMonologueCharactersPerSecond);
+            yield return new WaitForSecondsRealtime(0.4f);
+            yield return fadeOverlayController.PlayFadeToBlack(openingFadeDuration);
+            SetCanvasGroupState(introMonologueCanvasGroup, false);
+            introMonologueText.text = string.Empty;
+        }
+
+        private IEnumerator BeginWakeIntoPhoneRoutine()
+        {
+            SetBackground(roomBackground);
+            PlayMusicIfNeeded(roomMusic);
+            PlaySfx(phoneNotificationSfx);
+            yield return fadeOverlayController.PlayFadeFromBlack(introWakeRevealDuration);
+            BeginPhoneBeatInternal(false);
+        }
+
+        private IEnumerator TypeTextRoutine(TMP_Text targetText, string content, float charactersPerSecond)
+        {
+            if (targetText == null || string.IsNullOrEmpty(content))
+            {
+                yield break;
+            }
+
+            if (charactersPerSecond <= 0f)
+            {
+                targetText.text += content;
+                yield break;
+            }
+
+            float delay = 1f / charactersPerSecond;
+            for (int i = 0; i < content.Length; i++)
+            {
+                targetText.text += content[i];
+                yield return new WaitForSecondsRealtime(delay);
+            }
+        }
+
+        private void ConfigureCanonicalIntroTexts()
+        {
+            if (introSavingText != null)
+            {
+                introSavingText.text = introSavingLabel;
+            }
+
+            if (introChapterNumberText != null)
+            {
+                introChapterNumberText.text = introChapterNumberLabel;
+            }
+
+            if (introChapterNameText != null)
+            {
+                introChapterNameText.text = introChapterNameLabel;
+            }
+
+            if (introMonologueText != null)
+            {
+                introMonologueText.text = string.Empty;
+            }
+        }
+
+        private void HideCanonicalIntroVisuals()
+        {
+            SetCanvasGroupState(introSavingCanvasGroup, false);
+            SetCanvasGroupState(introChapterTitleCanvasGroup, false);
+            SetCanvasGroupState(introMonologueCanvasGroup, false);
+
+            if (introMonologueText != null)
+            {
+                introMonologueText.text = string.Empty;
+            }
+        }
+
         private void BeginIntro()
         {
             CurrentBeat = Chapter01Beat.Intro;
@@ -215,8 +407,24 @@ namespace EntreTuSilencio.Chapter01
 
         private void BeginPhoneBeat()
         {
+            BeginPhoneBeatInternal(true);
+        }
+
+        private void BeginPhoneBeatInternal(bool playNotificationSfx)
+        {
             SetBackground(roomBackground);
             CurrentBeat = Chapter01Beat.WaitingForPhoneClose;
+            PlayMusicIfNeeded(roomMusic);
+
+            if (dialogueController != null)
+            {
+                dialogueController.Hide();
+            }
+
+            if (playNotificationSfx)
+            {
+                PlaySfx(phoneNotificationSfx);
+            }
 
             if (phoneOverlayController != null && firstPhoneMessage != null)
             {
@@ -262,6 +470,7 @@ namespace EntreTuSilencio.Chapter01
         {
             SetBackground(friendsBackground);
             CurrentBeat = Chapter01Beat.Friends;
+            PlayMusicIfNeeded(roomMusic);
             PlayDialogueOrContinue(GetDialogueLinesForBeat(Chapter01Beat.Friends), BeginFirstChoice);
         }
 
@@ -287,6 +496,7 @@ namespace EntreTuSilencio.Chapter01
 
             SetBackground(hallwayBackground);
             CurrentBeat = Chapter01Beat.Hallway;
+            PlayMusicIfNeeded(hallwayMusic);
             PlayDialogueOrContinue(GetDialogueLinesForBeat(Chapter01Beat.Hallway), BeginSecondChoice);
         }
 
@@ -300,6 +510,7 @@ namespace EntreTuSilencio.Chapter01
         {
             SetBackground(cafeteriaBackground);
             CurrentBeat = Chapter01Beat.Cafeteria;
+            PlayMusicIfNeeded(cafeteriaMusic);
             PlayDialogueOrContinue(GetDialogueLinesForBeat(Chapter01Beat.Cafeteria), BeginThirdChoice);
         }
 
@@ -328,6 +539,8 @@ namespace EntreTuSilencio.Chapter01
 
         private IEnumerator CompleteChapterRoutine()
         {
+            PlaySfx(chapterCompleteSfx);
+
             if (fadeOverlayController != null)
             {
                 yield return fadeOverlayController.PlayFadeToBlack(endingFadeDuration);
@@ -336,6 +549,14 @@ namespace EntreTuSilencio.Chapter01
 
         private void HandleDialogueFinished()
         {
+            if (pendingDialogueCompletion != null)
+            {
+                Action completion = pendingDialogueCompletion;
+                pendingDialogueCompletion = null;
+                completion.Invoke();
+                return;
+            }
+
             switch (CurrentBeat)
             {
                 case Chapter01Beat.Intro:
@@ -367,6 +588,8 @@ namespace EntreTuSilencio.Chapter01
 
         private void HandleChoiceSelected(ChoiceOption selectedOption)
         {
+            PlaySfx(choiceSelectedSfx);
+
             if (selectedOption != null && trustController != null)
             {
                 trustController.ApplyDeltas(selectedOption.seongsuTrustDelta, selectedOption.jeonghoTrustDelta);
@@ -375,13 +598,22 @@ namespace EntreTuSilencio.Chapter01
             switch (CurrentBeat)
             {
                 case Chapter01Beat.FirstChoice:
-                    BeginHallwayDialogue();
+                    PlayPostChoiceDialogueOrContinue(
+                        Chapter01Beat.FirstChoice,
+                        selectedOption,
+                        BeginHallwayDialogue);
                     break;
                 case Chapter01Beat.SecondChoice:
-                    BeginCafeteriaDialogue();
+                    PlayPostChoiceDialogueOrContinue(
+                        Chapter01Beat.SecondChoice,
+                        selectedOption,
+                        BeginCafeteriaDialogue);
                     break;
                 case Chapter01Beat.ThirdChoice:
-                    BeginEndingDialogue();
+                    PlayPostChoiceDialogueOrContinue(
+                        Chapter01Beat.ThirdChoice,
+                        selectedOption,
+                        BeginEndingDialogue);
                     break;
             }
         }
@@ -414,6 +646,23 @@ namespace EntreTuSilencio.Chapter01
             choiceController.ShowChoice(beat.prompt, beat.options);
         }
 
+        private void PlayPostChoiceDialogueOrContinue(
+            Chapter01Beat choiceBeat,
+            ChoiceOption selectedOption,
+            Action onEmptyOrFinished)
+        {
+            DialogueLine[] lines = GetPostChoiceLines(choiceBeat, selectedOption);
+
+            if (dialogueController == null || lines == null || lines.Length == 0)
+            {
+                onEmptyOrFinished?.Invoke();
+                return;
+            }
+
+            pendingDialogueCompletion = onEmptyOrFinished;
+            dialogueController.PlayLines(lines);
+        }
+
         private void SetBackground(Sprite backgroundSprite)
         {
             if (backgroundImage == null || backgroundSprite == null)
@@ -432,6 +681,7 @@ namespace EntreTuSilencio.Chapter01
             }
 
             SetCanvasGroupState(roomExitCanvasGroup, false);
+            PlaySfx(roomExitSfx);
             BeginFriendsDialogue();
         }
 
@@ -484,6 +734,33 @@ namespace EntreTuSilencio.Chapter01
             canvasGroup.blocksRaycasts = visible;
         }
 
+        private void PlayMusicIfNeeded(AudioClip clip)
+        {
+            if (musicSource == null || clip == null)
+            {
+                return;
+            }
+
+            if (musicSource.clip == clip && musicSource.isPlaying)
+            {
+                return;
+            }
+
+            musicSource.clip = clip;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
+
+        private void PlaySfx(AudioClip clip)
+        {
+            if (sfxSource == null || clip == null)
+            {
+                return;
+            }
+
+            sfxSource.PlayOneShot(clip);
+        }
+
         private DialogueLine[] GetDialogueLinesForBeat(Chapter01Beat beat)
         {
             DialogueLine[] configuredLines = beat switch
@@ -525,6 +802,16 @@ namespace EntreTuSilencio.Chapter01
             return useFallbackDataWhenEmpty ? BuildFallbackChoice(beat) : null;
         }
 
+        private DialogueLine[] GetPostChoiceLines(Chapter01Beat beat, ChoiceOption selectedOption)
+        {
+            if (!useFallbackDataWhenEmpty || selectedOption == null)
+            {
+                return null;
+            }
+
+            return BuildFallbackPostChoiceLines(beat, selectedOption);
+        }
+
         private DialogueLine[] BuildFallbackLines(Chapter01Beat beat)
         {
             Sprite leftPortrait = dialogueController != null ? dialogueController.LeftPortraitSprite : null;
@@ -535,15 +822,15 @@ namespace EntreTuSilencio.Chapter01
                 case Chapter01Beat.Intro:
                     return new[]
                     {
-                        CreateLine(string.Empty, "Otro dia. Otro intento de salir de casa sin sentir que el pecho pesa demasiado.", DialogueSpeakerMode.Thought),
-                        CreateLine(string.Empty, "Tal vez hoy pueda soportarlo un poco mejor.", DialogueSpeakerMode.Thought),
+                        CreateLine(string.Empty, "Uno pensaria que con los anos la vida se haria mas sencilla, que con cada dia el peso seria mas liviano, y vivir seria menos una carga.", DialogueSpeakerMode.Thought),
+                        CreateLine(string.Empty, "Pero al parecer no.", DialogueSpeakerMode.Thought),
                     };
                 case Chapter01Beat.Room:
                     return new[]
                     {
-                        CreateLine(string.Empty, "Seongsu ya empezo con su energia de siempre.", DialogueSpeakerMode.Thought),
-                        CreateLine(string.Empty, "Si no me apuro, va a venir a arrastrarme ella misma.", DialogueSpeakerMode.Thought),
-                        CreateLine(string.Empty, "Bien. Respiro. Me cambio. Salgo.", DialogueSpeakerMode.Thought),
+                        CreateLine(string.Empty, "Por que me cuesta tanto? Lo intento, de verdad lo intento, pero siempre siento que estoy un paso atras, como si nunca pudiera alcanzar lo que se espera de mi.", DialogueSpeakerMode.Thought),
+                        CreateLine(string.Empty, "No entiendo por que todo parece tan sencillo para los demas y yo sigo aqui, atrapada en mi propio ritmo.", DialogueSpeakerMode.Thought),
+                        CreateLine(string.Empty, "...Supongo que no tengo otra opcion.", DialogueSpeakerMode.Thought),
                     };
                 case Chapter01Beat.RoomInspectingBonsai:
                     return new[]
@@ -560,27 +847,46 @@ namespace EntreTuSilencio.Chapter01
                 case Chapter01Beat.Friends:
                     return new[]
                     {
-                        CreateLine("Seongsu", "Sabia que ibas a tardarte. Por eso te escribi temprano.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
-                        CreateLine("Jeongho", "Igual llego antes de que tuvieras que ir por ella.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
-                        CreateLine(string.Empty, "Los dos estan aqui. Eso deberia tranquilizarme.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Seongsu", "Hasta que te dignas en salir! Se me iba a quemar la cabeza aqui afuera.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine("Jeongho", "Ya, ya salio, no generes mas drama.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
+                        CreateLine("Jeongho", "Ya ya, ten. Se nota que lo necesitas.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Una barra de proteina, muy creativo jajaja.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
                     };
                 case Chapter01Beat.Hallway:
                     return new[]
                     {
-                        CreateLine(string.Empty, "El ruido del pasillo siempre llega primero que el valor.", DialogueSpeakerMode.Thought),
-                        CreateLine("Seongsu", "Vamos juntos. Solo es el primer dia.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Me alegra estar con ellos... Aqui no siento que falte algo.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Estar con ellos la hacia olvidar sus problemas, aunque fuera por un rato. Eran como su pequeno refugio.", DialogueSpeakerMode.Narration, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Seongsu", "Estas bien?", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine("Jihuun", "\"Estoy cansada\"", DialogueSpeakerMode.Signed, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Jeongho", "\"Mentirosa\"", DialogueSpeakerMode.Signed, PortraitFocus.Right, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "A veces... me siento atrapada en mi propia cabeza.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Jeongho", "Pero te dejaremos tranquila... por ahora.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Todos hablan... Todos rien... Y yo... estoy aqui. Pero no me siento presente.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
                     };
                 case Chapter01Beat.Cafeteria:
                     return new[]
                     {
-                        CreateLine("Seongsu", "Si sobrevivimos a la mañana, merecemos algo rico en la cafeteria.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
-                        CreateLine("Jeongho", "Eso sono mas dramatico de lo necesario.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
-                        CreateLine(string.Empty, "Aun asi, la idea de sentarnos un rato no suena mal.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "La manana paso como todas las demas: clases, notas, miradas rapidas entre los companeros.", DialogueSpeakerMode.Narration, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Seongsu", "Sabes que se me antoja? Un pastel de mango.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine("Jeongho", "Te tropezaste con una planta, no salvaste el mundo.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
+                        CreateLine("Seongsu", "Y tu que vas a pedir?", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine("Jihuun", "\"Jugo de durazno\"", DialogueSpeakerMode.Signed, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Jeongho", "Obvio. Desde que te conozco, la mas adicta al jugo de durazno.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Seongsu sonrio con carino y fue a hacer el pedido.", DialogueSpeakerMode.Narration, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Jeongho saco su celular para ensenarle a Jihuun un video absurdo de un gato atrapado en una bolsa de papel.", DialogueSpeakerMode.Narration, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Seongsu volvio con la bandeja: dos pasteles, un cafe americano y su jugo de durazno.", DialogueSpeakerMode.Narration, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Seongsu", "Ahi tienes. Tu dosis de vida liquida.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Sin decir nada mas, Seongsu partio su pastelito por la mitad y le ofrecio un pedazo a Jihuun.", DialogueSpeakerMode.Narration, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Seongsu", "Apostaria a que ni siquiera tiene subtitulos.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine("Seongsu", "Es mas, apuesto a que ni el director se acuerda que la hizo.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine("Jihuun", "\"Ni yo la conozco\"", DialogueSpeakerMode.Signed, PortraitFocus.None, leftPortrait, rightPortrait),
+                        CreateLine("Seongsu", "Ya ves? Hasta Jihuun lo dice, y ella es la mas cool de nosotros.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                        CreateLine(string.Empty, "Aqui... es facil. No necesito hablar.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
                     };
                 case Chapter01Beat.Ending:
                     return new[]
                     {
-                        CreateLine(string.Empty, "Por un segundo, siento que alguien me observa desde lejos.", DialogueSpeakerMode.Thought),
                         CreateLine(string.Empty, "Capitulo 1 terminado.", DialogueSpeakerMode.Narration),
                     };
                 default:
@@ -595,39 +901,116 @@ namespace EntreTuSilencio.Chapter01
                 case Chapter01Beat.FirstChoice:
                     return new ChapterChoiceBeat
                     {
-                        prompt = "¿Como reacciona Jihuun al ver a sus amigos?",
+                        prompt = "Como reacciona Jihuun al ver a sus amigos?",
                         options = new[]
                         {
-                            CreateChoice("smile_softly", "Sonrie ligeramente.", 1, 1),
-                            CreateChoice("just_watch", "Solo observa.", 0, 0),
-                            CreateChoice("sign_to_jeongho", "Hace una sena a Jeongho.", 0, 1),
+                            CreateChoice("smile_softly", "Sonrie ligeramente", 1, 1),
+                            CreateChoice("just_watch", "Solo observa", 0, 0),
+                            CreateChoice("sign_to_jeongho", "Hace una sena a Jeongho", 0, 1),
                         }
                     };
                 case Chapter01Beat.SecondChoice:
                     return new ChapterChoiceBeat
                     {
-                        prompt = "¿Como procesa el ruido del pasillo?",
+                        prompt = "Como procesa Jihuun el ruido del pasillo?",
                         options = new[]
                         {
-                            CreateChoice("look_around", "Mirar a la gente.", 0, 0),
-                            CreateChoice("look_down", "Bajar la mirada.", 0, 0),
-                            CreateChoice("ignore_everything", "Ignorar todo.", 0, 0),
+                            CreateChoice("look_around", "Mirar a la gente", 0, 0),
+                            CreateChoice("look_down", "Bajar la mirada", 0, 0),
+                            CreateChoice("ignore_everything", "Ignorar todo", 0, 0),
                         }
                     };
                 case Chapter01Beat.ThirdChoice:
                     return new ChapterChoiceBeat
                     {
-                        prompt = "¿Como participa Jihuun en la conversacion?",
+                        prompt = "Como participa Jihuun en la conversacion?",
                         options = new[]
                         {
-                            CreateChoice("propose_weekend_plan", "Propone un plan para el fin de semana.", 1, 1),
-                            CreateChoice("just_watch_again", "Solo observa.", 0, 0),
-                            CreateChoice("write_on_phone", "Escribe su idea en el celular.", 1, 1),
+                            CreateChoice("propose_weekend_plan", "Propone idea de salir el fin de semana", 1, 1),
+                            CreateChoice("just_watch_again", "Solo observa", 0, 0),
+                            CreateChoice("write_on_phone", "Escribe en celular", 1, 1),
                         }
                     };
                 default:
                     return null;
             }
+        }
+
+        private DialogueLine[] BuildFallbackPostChoiceLines(Chapter01Beat beat, ChoiceOption selectedOption)
+        {
+            Sprite leftPortrait = dialogueController != null ? dialogueController.LeftPortraitSprite : null;
+            Sprite rightPortrait = dialogueController != null ? dialogueController.RightPortraitSprite : null;
+
+            switch (beat)
+            {
+                case Chapter01Beat.FirstChoice:
+                    if (selectedOption.optionId == "sign_to_jeongho")
+                    {
+                        return new[]
+                        {
+                            CreateLine("Jihuun", "\"Ya lo tenias preparado?\"", DialogueSpeakerMode.Signed, PortraitFocus.None, leftPortrait, rightPortrait),
+                            CreateLine("Jeongho", "Para que veas jajaja, era predecible.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
+                        };
+                    }
+
+                    return null;
+
+                case Chapter01Beat.SecondChoice:
+                    switch (selectedOption.optionId)
+                    {
+                        case "look_around":
+                            return new[]
+                            {
+                                CreateLine(string.Empty, "Levanto la mirada.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine(string.Empty, "Por un segundo, todo se vuelve mas claro. Rostros. Movimiento. Ruido. Demasiado.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine(string.Empty, "Y entonces... alguien me esta mirando. No es como los demas. No se aparta de inmediato.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                            };
+                        case "look_down":
+                            return new[]
+                            {
+                                CreateLine(string.Empty, "Bajo la mirada.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine(string.Empty, "Es mas facil asi. Nadie se detiene. Nadie pregunta. Solo pasos y ruido.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                            };
+                        case "ignore_everything":
+                            return new[]
+                            {
+                                CreateLine(string.Empty, "...", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                            };
+                    }
+
+                    return null;
+
+                case Chapter01Beat.ThirdChoice:
+                    switch (selectedOption.optionId)
+                    {
+                        case "propose_weekend_plan":
+                            return new[]
+                            {
+                                CreateLine(string.Empty, "Levanto las manos antes de pensarlo demasiado. Hago la sena torpemente... pero suficiente.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine("Seongsu", "Burbujas?! Me encanta!", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                                CreateLine("Jeongho", "Ok, eso si no me lo esperaba.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
+                                CreateLine(string.Empty, "Alguien me estaba mirando otra vez. Levante la vista, y ahi estaba el. No me gustaba sentirme observada asi.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                            };
+                        case "just_watch_again":
+                            return new[]
+                            {
+                                CreateLine(string.Empty, "Alguien me estaba mirando otra vez. Levante la vista, y ahi estaba el.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine(string.Empty, "Su mirada no era cruel, pero igual se sentia pesada. Baje la cabeza rapidamente.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                            };
+                        case "write_on_phone":
+                            return new[]
+                            {
+                                CreateLine(string.Empty, "Escribo rapido en el celular y les enseno la pantalla.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine("Seongsu", "Burbujas?! Me encanta!", DialogueSpeakerMode.Spoken, PortraitFocus.Left, leftPortrait, rightPortrait),
+                                CreateLine("Jeongho", "Ok, eso si no me lo esperaba.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, leftPortrait, rightPortrait),
+                                CreateLine(string.Empty, "Alguien me estaba mirando otra vez. No sabia que hacer con esa curiosidad ajena.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                            };
+                    }
+
+                    return null;
+            }
+
+            return null;
         }
 
         private DialogueLine CreateLine(

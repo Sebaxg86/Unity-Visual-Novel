@@ -53,10 +53,28 @@ namespace EntreTuSilencio.Dialogue
             StopTyping();
             activeLines.Clear();
             currentIndex = -1;
+
+            if (speakerNameText != null)
+            {
+                speakerNameText.text = string.Empty;
+                speakerNameText.gameObject.SetActive(false);
+            }
+
             if (bodyText != null)
             {
                 bodyText.text = string.Empty;
             }
+
+            if (leftPortraitImage != null)
+            {
+                leftPortraitImage.gameObject.SetActive(false);
+            }
+
+            if (rightPortraitImage != null)
+            {
+                rightPortraitImage.gameObject.SetActive(false);
+            }
+
             SetVisibility(false);
         }
 
