@@ -23,6 +23,7 @@ namespace EntreTuSilencio.Chapter01
         Intro,
         WaitingForPhoneClose,
         Room,
+        RoomExploration,
         Friends,
         FirstChoice,
         Hallway,
@@ -41,6 +42,7 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private float openingFadeDuration = 0.45f;
         [SerializeField] private float endingFadeDuration = 0.75f;
         [SerializeField] private bool useFallbackDataWhenEmpty = true;
+        [SerializeField] private float firstChoiceTutorialDuration = 2.75f;
 
         [Header("Scene References")]
         [SerializeField] private Image backgroundImage;
@@ -50,6 +52,8 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private ChoiceController choiceController;
         [SerializeField] private PhoneOverlayController phoneOverlayController;
         [SerializeField] private TrustController trustController;
+        [SerializeField] private CanvasGroup roomExitCanvasGroup;
+        [SerializeField] private Button roomExitButton;
 
         [Header("Backgrounds")]
         [SerializeField] private Sprite introBackground;
@@ -92,6 +96,11 @@ namespace EntreTuSilencio.Chapter01
             {
                 phoneOverlayController.Closed += HandlePhoneClosed;
             }
+
+            if (roomExitButton != null)
+            {
+                roomExitButton.onClick.AddListener(HandleRoomExitClicked);
+            }
         }
 
         private void OnDisable()
@@ -109,6 +118,11 @@ namespace EntreTuSilencio.Chapter01
             if (phoneOverlayController != null)
             {
                 phoneOverlayController.Closed -= HandlePhoneClosed;
+            }
+
+            if (roomExitButton != null)
+            {
+                roomExitButton.onClick.RemoveListener(HandleRoomExitClicked);
             }
         }
 
@@ -140,6 +154,8 @@ namespace EntreTuSilencio.Chapter01
                 trustController.ResetTrust();
                 trustController.HideTutorial();
             }
+
+            SetCanvasGroupState(roomExitCanvasGroup, false);
 
             StartCoroutine(BeginChapterRoutine());
         }
@@ -196,7 +212,24 @@ namespace EntreTuSilencio.Chapter01
         private void BeginRoomDialogue()
         {
             CurrentBeat = Chapter01Beat.Room;
-            PlayDialogueOrContinue(GetDialogueLinesForBeat(Chapter01Beat.Room), BeginFriendsDialogue);
+            PlayDialogueOrContinue(GetDialogueLinesForBeat(Chapter01Beat.Room), BeginRoomExploration);
+        }
+
+        private void BeginRoomExploration()
+        {
+            if (roomExitCanvasGroup == null && roomExitButton == null)
+            {
+                BeginFriendsDialogue();
+                return;
+            }
+
+            CurrentBeat = Chapter01Beat.RoomExploration;
+            SetCanvasGroupState(roomExitCanvasGroup, true);
+
+            if (dialogueController != null)
+            {
+                dialogueController.Hide();
+            }
         }
 
         private void BeginFriendsDialogue()
@@ -212,7 +245,8 @@ namespace EntreTuSilencio.Chapter01
 
             if (trustController != null)
             {
-                trustController.ShowTutorial();
+                StartCoroutine(ShowFirstChoiceAfterTutorialRoutine());
+                return;
             }
 
             ShowChoiceOrContinue(GetChoiceBeatFor(Chapter01Beat.FirstChoice), BeginHallwayDialogue);
@@ -282,7 +316,7 @@ namespace EntreTuSilencio.Chapter01
                     BeginPhoneBeat();
                     break;
                 case Chapter01Beat.Room:
-                    BeginFriendsDialogue();
+                    BeginRoomExploration();
                     break;
                 case Chapter01Beat.Friends:
                     BeginFirstChoice();
@@ -356,6 +390,42 @@ namespace EntreTuSilencio.Chapter01
             }
 
             backgroundImage.sprite = backgroundSprite;
+        }
+
+        private void HandleRoomExitClicked()
+        {
+            if (CurrentBeat != Chapter01Beat.RoomExploration)
+            {
+                return;
+            }
+
+            SetCanvasGroupState(roomExitCanvasGroup, false);
+            BeginFriendsDialogue();
+        }
+
+        private IEnumerator ShowFirstChoiceAfterTutorialRoutine()
+        {
+            trustController.ShowTutorial();
+
+            if (firstChoiceTutorialDuration > 0f)
+            {
+                yield return new WaitForSeconds(firstChoiceTutorialDuration);
+            }
+
+            trustController.HideTutorial();
+            ShowChoiceOrContinue(GetChoiceBeatFor(Chapter01Beat.FirstChoice), BeginHallwayDialogue);
+        }
+
+        private void SetCanvasGroupState(CanvasGroup canvasGroup, bool visible)
+        {
+            if (canvasGroup == null)
+            {
+                return;
+            }
+
+            canvasGroup.alpha = visible ? 1f : 0f;
+            canvasGroup.interactable = visible;
+            canvasGroup.blocksRaycasts = visible;
         }
 
         private DialogueLine[] GetDialogueLinesForBeat(Chapter01Beat beat)

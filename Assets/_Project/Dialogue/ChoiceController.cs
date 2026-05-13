@@ -25,6 +25,11 @@ namespace EntreTuSilencio.Dialogue
                 rootCanvasGroup = GetComponent<CanvasGroup>();
             }
 
+            if (optionButtonPrefab != null)
+            {
+                optionButtonPrefab.gameObject.SetActive(false);
+            }
+
             Hide();
         }
 
