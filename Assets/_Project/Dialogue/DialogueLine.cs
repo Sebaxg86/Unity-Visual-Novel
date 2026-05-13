@@ -28,6 +28,9 @@ namespace EntreTuSilencio.Dialogue
         public PortraitFocus portraitFocus = PortraitFocus.None;
         public Sprite leftPortrait;
         public Sprite rightPortrait;
+        public Sprite[] leftPortraitSequence;
+        public Sprite[] rightPortraitSequence;
+        public float portraitSequenceFrameDuration = 0.12f;
 
         [TextArea(2, 5)]
         public string text;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -13,8 +14,10 @@ namespace EntreTuSilencio.Dialogue
         [SerializeField] private TMP_Text promptText;
         [SerializeField] private Transform buttonContainer;
         [SerializeField] private Button optionButtonPrefab;
+        [SerializeField] private float showFadeDuration = 0.18f;
 
         private readonly List<Button> spawnedButtons = new List<Button>();
+        private Coroutine visibilityRoutine;
 
         public event Action<ChoiceOption> ChoiceSelected;
 
@@ -30,7 +33,7 @@ namespace EntreTuSilencio.Dialogue
                 optionButtonPrefab.gameObject.SetActive(false);
             }
 
-            Hide();
+            HideInstant();
         }
 
         public void ShowChoice(string prompt, IList<ChoiceOption> options)
@@ -65,12 +68,20 @@ namespace EntreTuSilencio.Dialogue
                 spawnedButtons.Add(button);
             }
 
-            SetVisibility(true);
+            ShowSmooth();
         }
 
         public void Hide()
         {
             ClearButtons();
+            StopVisibilityRoutine();
+            SetVisibility(false);
+        }
+
+        public void HideInstant()
+        {
+            ClearButtons();
+            StopVisibilityRoutine();
             SetVisibility(false);
         }
 
@@ -104,6 +115,59 @@ namespace EntreTuSilencio.Dialogue
             rootCanvasGroup.alpha = visible ? 1f : 0f;
             rootCanvasGroup.blocksRaycasts = visible;
             rootCanvasGroup.interactable = visible;
+        }
+
+        private void ShowSmooth()
+        {
+            if (rootCanvasGroup == null)
+            {
+                SetVisibility(true);
+                return;
+            }
+
+            StopVisibilityRoutine();
+            rootCanvasGroup.alpha = 0f;
+            rootCanvasGroup.blocksRaycasts = false;
+            rootCanvasGroup.interactable = false;
+            visibilityRoutine = StartCoroutine(FadeCanvasGroupRoutine(1f, showFadeDuration, true));
+        }
+
+        private IEnumerator FadeCanvasGroupRoutine(float targetAlpha, float duration, bool enableInteractionAtEnd)
+        {
+            if (rootCanvasGroup == null)
+            {
+                yield break;
+            }
+
+            float startAlpha = rootCanvasGroup.alpha;
+            float safeDuration = duration > 0f ? duration : 0.01f;
+            float elapsed = 0f;
+
+            while (elapsed < safeDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / safeDuration);
+                float eased = Mathf.SmoothStep(0f, 1f, t);
+                rootCanvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, eased);
+                yield return null;
+            }
+
+            rootCanvasGroup.alpha = targetAlpha;
+            bool visible = targetAlpha > 0.001f;
+            rootCanvasGroup.blocksRaycasts = visible && enableInteractionAtEnd;
+            rootCanvasGroup.interactable = visible && enableInteractionAtEnd;
+            visibilityRoutine = null;
+        }
+
+        private void StopVisibilityRoutine()
+        {
+            if (visibilityRoutine == null)
+            {
+                return;
+            }
+
+            StopCoroutine(visibilityRoutine);
+            visibilityRoutine = null;
         }
     }
 }

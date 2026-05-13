@@ -20,12 +20,21 @@ namespace EntreTuSilencio.Dialogue
         [SerializeField] private Color defaultSpeakerColor = Color.white;
         [SerializeField] private Color activePortraitColor = Color.white;
         [SerializeField] private Color inactivePortraitColor = new Color(1f, 1f, 1f, 0.45f);
+        [SerializeField] private bool animatePortraitEntrances = true;
+        [SerializeField] private float portraitEntranceDuration = 0.22f;
+        [SerializeField] private float portraitEntranceOffset = 160f;
 
         private readonly List<DialogueLine> activeLines = new List<DialogueLine>();
         private Coroutine typingRoutine;
+        private Coroutine leftPortraitSequenceRoutine;
+        private Coroutine rightPortraitSequenceRoutine;
+        private Coroutine leftPortraitEntranceRoutine;
+        private Coroutine rightPortraitEntranceRoutine;
         private int currentIndex = -1;
         private bool sequenceCompleted;
         private string currentRenderedText = string.Empty;
+        private Vector2 leftPortraitDefaultPosition;
+        private Vector2 rightPortraitDefaultPosition;
 
         public event Action<int, DialogueLine> LineShown;
         public event Action SequenceFinished;
@@ -41,6 +50,9 @@ namespace EntreTuSilencio.Dialogue
             {
                 rootCanvasGroup = GetComponent<CanvasGroup>();
             }
+
+            leftPortraitDefaultPosition = GetPortraitAnchoredPosition(leftPortraitImage);
+            rightPortraitDefaultPosition = GetPortraitAnchoredPosition(rightPortraitImage);
         }
 
         public void Show()
@@ -51,6 +63,8 @@ namespace EntreTuSilencio.Dialogue
         public void Hide()
         {
             StopTyping();
+            StopPortraitSequences();
+            StopPortraitEntranceAnimations();
             activeLines.Clear();
             currentIndex = -1;
 
@@ -171,24 +185,61 @@ namespace EntreTuSilencio.Dialogue
 
         private void ApplyPortraits(DialogueLine line)
         {
-            ApplyPortrait(leftPortraitImage, line.leftPortrait);
-            ApplyPortrait(rightPortraitImage, line.rightPortrait);
+            StopPortraitSequences();
+            StopPortraitEntranceAnimations();
 
-            switch (line.portraitFocus)
+            if (line == null)
             {
-                case PortraitFocus.Left:
-                    SetPortraitTint(leftPortraitImage, activePortraitColor);
-                    SetPortraitTint(rightPortraitImage, inactivePortraitColor);
-                    break;
-                case PortraitFocus.Right:
-                    SetPortraitTint(leftPortraitImage, inactivePortraitColor);
-                    SetPortraitTint(rightPortraitImage, activePortraitColor);
-                    break;
-                default:
-                    SetPortraitTint(leftPortraitImage, activePortraitColor);
-                    SetPortraitTint(rightPortraitImage, activePortraitColor);
-                    break;
+                ApplyPortrait(leftPortraitImage, null);
+                ApplyPortrait(rightPortraitImage, null);
+                return;
             }
+
+            if (line.speakerMode == DialogueSpeakerMode.Narration || line.speakerMode == DialogueSpeakerMode.Thought)
+            {
+                ApplyPortrait(leftPortraitImage, null);
+                ApplyPortrait(rightPortraitImage, null);
+                return;
+            }
+
+            bool leftWasVisible = leftPortraitImage != null && leftPortraitImage.gameObject.activeSelf;
+            bool rightWasVisible = rightPortraitImage != null && rightPortraitImage.gameObject.activeSelf;
+
+            Sprite leftPortrait = GetPortraitStartSprite(line.leftPortrait, line.leftPortraitSequence);
+            Sprite rightPortrait = GetPortraitStartSprite(line.rightPortrait, line.rightPortraitSequence);
+
+            ApplyPortrait(leftPortraitImage, leftPortrait);
+            ApplyPortrait(rightPortraitImage, rightPortrait);
+
+            AnimatePortraitEntranceIfNeeded(leftPortraitImage, leftWasVisible, leftPortrait, true);
+            AnimatePortraitEntranceIfNeeded(rightPortraitImage, rightWasVisible, rightPortrait, false);
+
+            if (line.speakerMode == DialogueSpeakerMode.Signed && IsSpeaker(line, "Jihuun"))
+            {
+                SetPortraitTint(leftPortraitImage, inactivePortraitColor);
+                SetPortraitTint(rightPortraitImage, inactivePortraitColor);
+            }
+            else
+            {
+                switch (line.portraitFocus)
+                {
+                    case PortraitFocus.Left:
+                        SetPortraitTint(leftPortraitImage, activePortraitColor);
+                        SetPortraitTint(rightPortraitImage, inactivePortraitColor);
+                        break;
+                    case PortraitFocus.Right:
+                        SetPortraitTint(leftPortraitImage, inactivePortraitColor);
+                        SetPortraitTint(rightPortraitImage, activePortraitColor);
+                        break;
+                    default:
+                        SetPortraitTint(leftPortraitImage, activePortraitColor);
+                        SetPortraitTint(rightPortraitImage, activePortraitColor);
+                        break;
+                }
+            }
+
+            StartPortraitSequence(leftPortraitImage, line.leftPortraitSequence, line.portraitSequenceFrameDuration, true);
+            StartPortraitSequence(rightPortraitImage, line.rightPortraitSequence, line.portraitSequenceFrameDuration, false);
         }
 
         private void ApplyPortrait(Image targetImage, Sprite portrait)
@@ -215,6 +266,190 @@ namespace EntreTuSilencio.Dialogue
             }
 
             targetImage.color = tint;
+        }
+
+        private Vector2 GetPortraitAnchoredPosition(Image portraitImage)
+        {
+            if (portraitImage == null)
+            {
+                return Vector2.zero;
+            }
+
+            RectTransform rectTransform = portraitImage.transform as RectTransform;
+            if (rectTransform == null)
+            {
+                return Vector2.zero;
+            }
+
+            return rectTransform.anchoredPosition;
+        }
+
+        private void AnimatePortraitEntranceIfNeeded(Image targetImage, bool wasVisible, Sprite portrait, bool isLeftPortrait)
+        {
+            if (targetImage == null || portrait == null)
+            {
+                return;
+            }
+
+            RectTransform rectTransform = targetImage.transform as RectTransform;
+            if (rectTransform == null)
+            {
+                return;
+            }
+
+            Vector2 defaultPosition = isLeftPortrait ? leftPortraitDefaultPosition : rightPortraitDefaultPosition;
+
+            if (!animatePortraitEntrances || wasVisible)
+            {
+                rectTransform.anchoredPosition = defaultPosition;
+                return;
+            }
+
+            float direction = isLeftPortrait ? -1f : 1f;
+            Vector2 startPosition = defaultPosition + new Vector2(direction * portraitEntranceOffset, 0f);
+            rectTransform.anchoredPosition = startPosition;
+
+            Coroutine entranceRoutine = StartCoroutine(PlayPortraitEntranceRoutine(rectTransform, startPosition, defaultPosition));
+            if (isLeftPortrait)
+            {
+                leftPortraitEntranceRoutine = entranceRoutine;
+            }
+            else
+            {
+                rightPortraitEntranceRoutine = entranceRoutine;
+            }
+        }
+
+        private Sprite GetPortraitStartSprite(Sprite fallbackPortrait, Sprite[] portraitSequence)
+        {
+            if (portraitSequence != null)
+            {
+                for (int i = 0; i < portraitSequence.Length; i++)
+                {
+                    if (portraitSequence[i] != null)
+                    {
+                        return portraitSequence[i];
+                    }
+                }
+            }
+
+            return fallbackPortrait;
+        }
+
+        private void StartPortraitSequence(Image targetImage, Sprite[] portraitSequence, float frameDuration, bool isLeftPortrait)
+        {
+            if (targetImage == null || !targetImage.gameObject.activeSelf)
+            {
+                return;
+            }
+
+            if (portraitSequence == null || portraitSequence.Length <= 1)
+            {
+                return;
+            }
+
+            Coroutine sequenceRoutine = StartCoroutine(PlayPortraitSequenceRoutine(targetImage, portraitSequence, frameDuration));
+
+            if (isLeftPortrait)
+            {
+                leftPortraitSequenceRoutine = sequenceRoutine;
+            }
+            else
+            {
+                rightPortraitSequenceRoutine = sequenceRoutine;
+            }
+        }
+
+        private IEnumerator PlayPortraitSequenceRoutine(Image targetImage, Sprite[] portraitSequence, float frameDuration)
+        {
+            if (targetImage == null || portraitSequence == null || portraitSequence.Length == 0)
+            {
+                yield break;
+            }
+
+            float safeFrameDuration = frameDuration > 0f ? frameDuration : 0.12f;
+
+            for (int i = 0; i < portraitSequence.Length; i++)
+            {
+                Sprite frame = portraitSequence[i];
+                if (frame != null)
+                {
+                    targetImage.sprite = frame;
+                }
+
+                if (i < portraitSequence.Length - 1)
+                {
+                    yield return new WaitForSecondsRealtime(safeFrameDuration);
+                }
+            }
+        }
+
+        private void StopPortraitSequences()
+        {
+            if (leftPortraitSequenceRoutine != null)
+            {
+                StopCoroutine(leftPortraitSequenceRoutine);
+                leftPortraitSequenceRoutine = null;
+            }
+
+            if (rightPortraitSequenceRoutine != null)
+            {
+                StopCoroutine(rightPortraitSequenceRoutine);
+                rightPortraitSequenceRoutine = null;
+            }
+        }
+
+        private IEnumerator PlayPortraitEntranceRoutine(RectTransform portraitTransform, Vector2 startPosition, Vector2 targetPosition)
+        {
+            if (portraitTransform == null)
+            {
+                yield break;
+            }
+
+            float duration = portraitEntranceDuration > 0f ? portraitEntranceDuration : 0.01f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float eased = Mathf.SmoothStep(0f, 1f, t);
+                portraitTransform.anchoredPosition = Vector2.Lerp(startPosition, targetPosition, eased);
+                yield return null;
+            }
+
+            portraitTransform.anchoredPosition = targetPosition;
+        }
+
+        private void StopPortraitEntranceAnimations()
+        {
+            StopPortraitEntranceAnimation(ref leftPortraitEntranceRoutine, leftPortraitImage, leftPortraitDefaultPosition);
+            StopPortraitEntranceAnimation(ref rightPortraitEntranceRoutine, rightPortraitImage, rightPortraitDefaultPosition);
+        }
+
+        private void StopPortraitEntranceAnimation(ref Coroutine entranceRoutine, Image portraitImage, Vector2 defaultPosition)
+        {
+            if (entranceRoutine != null)
+            {
+                StopCoroutine(entranceRoutine);
+                entranceRoutine = null;
+            }
+
+            if (portraitImage != null)
+            {
+                RectTransform rectTransform = portraitImage.transform as RectTransform;
+                if (rectTransform != null)
+                {
+                    rectTransform.anchoredPosition = defaultPosition;
+                }
+            }
+        }
+
+        private bool IsSpeaker(DialogueLine line, string speakerName)
+        {
+            return line != null
+                && !string.IsNullOrWhiteSpace(line.speakerName)
+                && line.speakerName.Equals(speakerName, StringComparison.OrdinalIgnoreCase);
         }
 
         private string FormatBodyText(DialogueLine line)
