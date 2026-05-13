@@ -24,6 +24,8 @@ namespace EntreTuSilencio.Chapter01
         WaitingForPhoneClose,
         Room,
         RoomExploration,
+        RoomInspectingBonsai,
+        RoomInspectingProteinBar,
         Friends,
         FirstChoice,
         Hallway,
@@ -54,6 +56,8 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private TrustController trustController;
         [SerializeField] private CanvasGroup roomExitCanvasGroup;
         [SerializeField] private Button roomExitButton;
+        [SerializeField] private Button roomBonsaiButton;
+        [SerializeField] private Button roomProteinBarButton;
 
         [Header("Backgrounds")]
         [SerializeField] private Sprite introBackground;
@@ -68,6 +72,8 @@ namespace EntreTuSilencio.Chapter01
         [Header("Dialogue")]
         [SerializeField] private DialogueLine[] introLines;
         [SerializeField] private DialogueLine[] roomLines;
+        [SerializeField] private DialogueLine[] roomBonsaiLines;
+        [SerializeField] private DialogueLine[] roomProteinBarLines;
         [SerializeField] private DialogueLine[] friendsLines;
         [SerializeField] private DialogueLine[] hallwayLines;
         [SerializeField] private DialogueLine[] cafeteriaLines;
@@ -101,6 +107,16 @@ namespace EntreTuSilencio.Chapter01
             {
                 roomExitButton.onClick.AddListener(HandleRoomExitClicked);
             }
+
+            if (roomBonsaiButton != null)
+            {
+                roomBonsaiButton.onClick.AddListener(HandleRoomBonsaiClicked);
+            }
+
+            if (roomProteinBarButton != null)
+            {
+                roomProteinBarButton.onClick.AddListener(HandleRoomProteinBarClicked);
+            }
         }
 
         private void OnDisable()
@@ -123,6 +139,16 @@ namespace EntreTuSilencio.Chapter01
             if (roomExitButton != null)
             {
                 roomExitButton.onClick.RemoveListener(HandleRoomExitClicked);
+            }
+
+            if (roomBonsaiButton != null)
+            {
+                roomBonsaiButton.onClick.RemoveListener(HandleRoomBonsaiClicked);
+            }
+
+            if (roomProteinBarButton != null)
+            {
+                roomProteinBarButton.onClick.RemoveListener(HandleRoomProteinBarClicked);
             }
         }
 
@@ -318,6 +344,12 @@ namespace EntreTuSilencio.Chapter01
                 case Chapter01Beat.Room:
                     BeginRoomExploration();
                     break;
+                case Chapter01Beat.RoomInspectingBonsai:
+                    BeginRoomExploration();
+                    break;
+                case Chapter01Beat.RoomInspectingProteinBar:
+                    BeginRoomExploration();
+                    break;
                 case Chapter01Beat.Friends:
                     BeginFirstChoice();
                     break;
@@ -403,6 +435,30 @@ namespace EntreTuSilencio.Chapter01
             BeginFriendsDialogue();
         }
 
+        private void HandleRoomBonsaiClicked()
+        {
+            if (CurrentBeat != Chapter01Beat.RoomExploration)
+            {
+                return;
+            }
+
+            CurrentBeat = Chapter01Beat.RoomInspectingBonsai;
+            SetCanvasGroupState(roomExitCanvasGroup, false);
+            PlayDialogueOrContinue(GetDialogueLinesForBeat(Chapter01Beat.RoomInspectingBonsai), BeginRoomExploration);
+        }
+
+        private void HandleRoomProteinBarClicked()
+        {
+            if (CurrentBeat != Chapter01Beat.RoomExploration)
+            {
+                return;
+            }
+
+            CurrentBeat = Chapter01Beat.RoomInspectingProteinBar;
+            SetCanvasGroupState(roomExitCanvasGroup, false);
+            PlayDialogueOrContinue(GetDialogueLinesForBeat(Chapter01Beat.RoomInspectingProteinBar), BeginRoomExploration);
+        }
+
         private IEnumerator ShowFirstChoiceAfterTutorialRoutine()
         {
             trustController.ShowTutorial();
@@ -434,6 +490,8 @@ namespace EntreTuSilencio.Chapter01
             {
                 Chapter01Beat.Intro => introLines,
                 Chapter01Beat.Room => roomLines,
+                Chapter01Beat.RoomInspectingBonsai => roomBonsaiLines,
+                Chapter01Beat.RoomInspectingProteinBar => roomProteinBarLines,
                 Chapter01Beat.Friends => friendsLines,
                 Chapter01Beat.Hallway => hallwayLines,
                 Chapter01Beat.Cafeteria => cafeteriaLines,
@@ -486,6 +544,18 @@ namespace EntreTuSilencio.Chapter01
                         CreateLine(string.Empty, "Seongsu ya empezo con su energia de siempre.", DialogueSpeakerMode.Thought),
                         CreateLine(string.Empty, "Si no me apuro, va a venir a arrastrarme ella misma.", DialogueSpeakerMode.Thought),
                         CreateLine(string.Empty, "Bien. Respiro. Me cambio. Salgo.", DialogueSpeakerMode.Thought),
+                    };
+                case Chapter01Beat.RoomInspectingBonsai:
+                    return new[]
+                    {
+                        CreateLine(string.Empty, "El bonsai sigue aqui, impecable.", DialogueSpeakerMode.Thought),
+                        CreateLine(string.Empty, "Cuidarlo siempre me obliga a bajar el ritmo un poco.", DialogueSpeakerMode.Thought),
+                    };
+                case Chapter01Beat.RoomInspectingProteinBar:
+                    return new[]
+                    {
+                        CreateLine(string.Empty, "La barra de proteina sigue donde la deje.", DialogueSpeakerMode.Thought),
+                        CreateLine(string.Empty, "Tal vez deberia llevarmela. Con Seongsu nunca se sabe cuanto va a durar la salida.", DialogueSpeakerMode.Thought),
                     };
                 case Chapter01Beat.Friends:
                     return new[]
