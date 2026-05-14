@@ -1,57 +1,52 @@
-# Estado Actual del Proyecto
+# Estado actual del proyecto
 
-## Resumen rapido
+## Resumen ejecutivo
 
-- Version de Unity detectada: `6000.4.4f1`
-- Rama actual de Git: `feature/fase1`
-- Escena principal actual: `Assets/Scenes/CH1_Cafeteria.unity`
-- El proyecto actual es un prototipo visual, no un capitulo completo jugable
+- **Motor:** Unity `6000.4.4f1`
+- **Estado:** primera build jugable del capítulo 1 completada
+- **Escenas principales:**
+  - `Assets/_Project/Scenes/MainMenu.unity`
+  - `Assets/_Project/Scenes/Chapter01.unity`
 
-## Lo que ya existe
+## Alcance logrado
 
-- Fondo de menu principal
-- Fondo de cuarto
-- Fondo de cafeteria
-- Caja de dialogo basica
-- Botones de menu y `Next`
-- Musica y algunos SFX
-- Scripts base para cambiar paneles y escribir texto letra por letra
+El proyecto ya cuenta con una vertical slice funcional del capítulo 1, con flujo jugable desde el menú principal hasta el cierre del episodio.
 
-## Lo que hoy esta incompleto
+### Implementado
 
-- `New Game` no dispara el flujo completo del capitulo 1
-- El boton `Next` actual recibe hover pero no tiene logica funcional completa
-- La escena actual mezcla menu, cuarto y cafeteria en un solo lugar
-- No existe flujo de telefono
-- No existe tutorial funcional del indicador de confianza
-- No existen elecciones ni cambios de confianza
-- No existe secuencia del pasillo / escaleras / escuela
-- No existe cierre de capitulo
+- menú principal funcional;
+- transición desde `New Game` hacia el capítulo;
+- intro narrativa del capítulo 1;
+- secuencia de teléfono;
+- exploración mínima del cuarto;
+- encuentro con Seongsu y Jeongho;
+- tres decisiones jugables;
+- sistema de confianza por personaje;
+- HUD y tutorial de confianza;
+- cambios de fondo con transiciones suaves;
+- retratos, expresiones y señas;
+- audio base del capítulo;
+- popup final de logro y regreso al menú;
+- build local para Windows.
 
-## Gaps contra el documento de tu amiga
+## Estado técnico actual
 
-- Intro de capitulo con negro > guardando > titulo > texto interno
-- Efecto de "abrir ojos" para entrar al cuarto
-- Overlay de telefono con mensajes de Seongsu
-- Exploracion minima del cuarto
-- Encuentro inicial con Seongsu y Jeongho
-- Tutorial del sistema de confianza
-- Decision social 1
-- Transicion al pasillo / escuela
-- Decision introspectiva 2
-- Escena de cafeteria completa
-- Decision final del capitulo
-- Pantalla de "capitulo terminado"
+La estructura principal ya no depende de la escena heredada `CH1_Cafeteria`. El proyecto fue reorganizado alrededor de escenas y sistemas propios dentro de `Assets/_Project/`.
 
-## Conclusion tecnica
+### Estado de calidad
 
-El Unity actual cubre solo una fraccion del storyboard. Lo correcto no es seguir parchando `CH1_Cafeteria` a ciegas, sino reconstruir el flujo del capitulo 1 con una estructura mas clara.
+El capítulo 1 es jugable y suficientemente estable para pruebas internas o playtesting temprano. Aun así, sigue siendo una primera versión de producción, no una versión final comercial.
 
-## Decision recomendada
+## Pendientes de siguiente fase
 
-Para fase 1:
+Los pendientes principales ya no están en el flujo base del capítulo 1, sino en sistemas complementarios y expansión:
 
-- separar `MainMenu` y `Chapter01`
-- mantener el alcance acotado al capitulo 1
-- dejar `save/load/settings` completos para despues
-- construir primero el flujo jugable de principio a fin
+- `Settings`
+- `Save / Load`
+- persistencia
+- contenido del capítulo 2 en adelante
+- refinamiento adicional de polish visual y audio
+
+## Decisión de documentación
+
+La documentación antigua de montaje paso a paso fue condensada en una estructura pública y general. El objetivo actual es mantener documentos que describan el proyecto, no notas personales de construcción.
