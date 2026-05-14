@@ -139,6 +139,7 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private PhoneNotificationOverlayController phoneNotificationController;
         [SerializeField] private PhoneOverlayController phoneOverlayController;
         [SerializeField] private TrustController trustController;
+        [SerializeField] private ChapterCompletePopupController chapterCompletePopupController;
         [SerializeField] private CanvasGroup roomExitCanvasGroup;
         [SerializeField] private Button roomExitButton;
         [SerializeField] private Button roomBonsaiButton;
@@ -194,6 +195,17 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private float dayTimelapseFadeDuration = 0.5f;
         [SerializeField] private float dayTimelapseBlackHoldDuration = 0.75f;
         [SerializeField] private float finalPassiveEndingHoldDuration = 1.4f;
+        [SerializeField] private float chapterCompletePopupDelay = 0.3f;
+
+        [Header("Chapter Complete Popup")]
+        [TextArea(1, 2)]
+        [SerializeField] private string chapterCompletePopupTitle = "Logro desbloqueado";
+
+        [TextArea(2, 3)]
+        [SerializeField] private string chapterCompletePopupBody = "Capítulo 1 completado.";
+
+        [TextArea(1, 2)]
+        [SerializeField] private string chapterCompletePopupConfirmLabel = "Volver al inicio";
 
         [Header("Dialogue")]
         [SerializeField] private DialogueLine[] introLines;
@@ -256,6 +268,11 @@ namespace EntreTuSilencio.Chapter01
                 trustController.TutorialClosed += HandleTrustTutorialClosed;
             }
 
+            if (chapterCompletePopupController != null)
+            {
+                chapterCompletePopupController.Confirmed += HandleChapterCompletePopupConfirmed;
+            }
+
             if (roomExitButton != null)
             {
                 roomExitButton.onClick.AddListener(HandleRoomExitClicked);
@@ -299,6 +316,11 @@ namespace EntreTuSilencio.Chapter01
             if (trustController != null)
             {
                 trustController.TutorialClosed -= HandleTrustTutorialClosed;
+            }
+
+            if (chapterCompletePopupController != null)
+            {
+                chapterCompletePopupController.Confirmed -= HandleChapterCompletePopupConfirmed;
             }
 
             if (roomExitButton != null)
@@ -382,6 +404,11 @@ namespace EntreTuSilencio.Chapter01
             if (phoneNotificationController != null)
             {
                 phoneNotificationController.Hide();
+            }
+
+            if (chapterCompletePopupController != null)
+            {
+                chapterCompletePopupController.HideInstant();
             }
 
             if (trustController != null)
@@ -963,12 +990,28 @@ namespace EntreTuSilencio.Chapter01
 
         private IEnumerator CompleteChapterRoutine()
         {
-            PlaySfx(chapterCompleteSfx);
-
             if (fadeOverlayController != null)
             {
                 yield return fadeOverlayController.PlayFadeToBlack(endingFadeDuration);
             }
+
+            if (chapterCompletePopupDelay > 0f)
+            {
+                yield return new WaitForSecondsRealtime(chapterCompletePopupDelay);
+            }
+
+            if (chapterCompletePopupController != null)
+            {
+                PlaySfx(chapterCompleteSfx);
+                chapterCompletePopupController.Show(
+                    chapterCompletePopupTitle,
+                    chapterCompletePopupBody,
+                    chapterCompletePopupConfirmLabel);
+                yield break;
+            }
+
+            PlaySfx(chapterCompleteSfx);
+            ReturnToMainMenu();
         }
 
         private void HandleDialogueFinished()
@@ -1250,6 +1293,16 @@ namespace EntreTuSilencio.Chapter01
 
             waitingForTrustTutorialClose = false;
             ContinueAfterTrustTutorial();
+        }
+
+        private void HandleChapterCompletePopupConfirmed()
+        {
+            if (chapterCompletePopupController != null)
+            {
+                chapterCompletePopupController.HideInstant();
+            }
+
+            ReturnToMainMenu();
         }
 
         private void ContinueAfterTrustTutorial()

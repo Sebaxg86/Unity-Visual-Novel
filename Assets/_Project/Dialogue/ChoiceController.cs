@@ -17,7 +17,8 @@ namespace EntreTuSilencio.Dialogue
         [SerializeField] private Button optionButtonPrefab;
         [SerializeField] private float showFadeDuration = 0.18f;
 
-        private readonly List<Button> spawnedButtons = new List<Button>();
+        private readonly List<Button> buttonPool = new List<Button>();
+        private readonly List<Button> activeButtons = new List<Button>();
         private Coroutine visibilityRoutine;
 
         public event Action<ChoiceOption> ChoiceSelected;
@@ -57,7 +58,7 @@ namespace EntreTuSilencio.Dialogue
             for (int i = 0; i < options.Count; i++)
             {
                 ChoiceOption option = options[i];
-                Button button = Instantiate(optionButtonPrefab, buttonContainer);
+                Button button = GetOrCreateButton();
                 button.gameObject.SetActive(true);
 
                 TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
@@ -66,9 +67,10 @@ namespace EntreTuSilencio.Dialogue
                     label.text = option.label;
                 }
 
+                button.onClick.RemoveAllListeners();
                 ConfigurePointerDownTrigger(button, option);
                 button.onClick.AddListener(() => HandleSelection(option));
-                spawnedButtons.Add(button);
+                activeButtons.Add(button);
             }
 
             ShowSmooth();
@@ -123,15 +125,44 @@ namespace EntreTuSilencio.Dialogue
 
         private void ClearButtons()
         {
-            for (int i = 0; i < spawnedButtons.Count; i++)
+            for (int i = 0; i < activeButtons.Count; i++)
             {
-                if (spawnedButtons[i] != null)
+                Button button = activeButtons[i];
+                if (button == null)
                 {
-                    Destroy(spawnedButtons[i].gameObject);
+                    continue;
+                }
+
+                button.onClick.RemoveAllListeners();
+
+                EventTrigger trigger = button.GetComponent<EventTrigger>();
+                if (trigger != null && trigger.triggers != null)
+                {
+                    trigger.triggers.Clear();
+                }
+
+                button.gameObject.SetActive(false);
+            }
+
+            activeButtons.Clear();
+        }
+
+        private Button GetOrCreateButton()
+        {
+            for (int i = 0; i < buttonPool.Count; i++)
+            {
+                Button pooledButton = buttonPool[i];
+                if (pooledButton != null && !pooledButton.gameObject.activeSelf)
+                {
+                    pooledButton.transform.SetParent(buttonContainer, false);
+                    pooledButton.transform.SetAsLastSibling();
+                    return pooledButton;
                 }
             }
 
-            spawnedButtons.Clear();
+            Button newButton = Instantiate(optionButtonPrefab, buttonContainer);
+            buttonPool.Add(newButton);
+            return newButton;
         }
 
         private void SetVisibility(bool visible)
