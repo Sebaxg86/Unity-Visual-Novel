@@ -13,8 +13,15 @@ namespace EntreTuSilencio.UI.MainMenu
         [SerializeField] private SceneFlowController sceneFlowController;
         [SerializeField] private bool startWithOnlyPressStart = true;
 
+        [Header("Audio")]
+        [SerializeField] private AudioSource musicSource;
+        [SerializeField] private AudioClip backgroundMusic;
+        [SerializeField] private bool loopBackgroundMusic = true;
+
         private void Awake()
         {
+            PlayBackgroundMusicIfNeeded();
+
             if (startWithOnlyPressStart)
             {
                 ShowPressStartOnly();
@@ -101,6 +108,23 @@ namespace EntreTuSilencio.UI.MainMenu
             canvasGroup.alpha = visible ? 1f : 0f;
             canvasGroup.interactable = visible;
             canvasGroup.blocksRaycasts = visible;
+        }
+
+        private void PlayBackgroundMusicIfNeeded()
+        {
+            if (musicSource == null || backgroundMusic == null)
+            {
+                return;
+            }
+
+            if (musicSource.isPlaying && musicSource.clip == backgroundMusic)
+            {
+                return;
+            }
+
+            musicSource.clip = backgroundMusic;
+            musicSource.loop = loopBackgroundMusic;
+            musicSource.Play();
         }
     }
 }
