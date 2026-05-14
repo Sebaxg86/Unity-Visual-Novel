@@ -159,8 +159,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: UN NUEVO COMIENZO
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9696039de338e864893f12041189f98a, type: 2}
+  m_sharedMaterial: {fileID: -2277971601858067699, guid: 9696039de338e864893f12041189f98a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -764,6 +764,9 @@ MonoBehaviour:
   messageImage: {fileID: 680937351}
   defaultMessageSprite: {fileID: -5649925074950309605, guid: 785c08b4e129d63449dc5f2c7ea0ebc2, type: 3}
   closeButton: {fileID: 928827593}
+  phoneTransform: {fileID: 0}
+  slideDuration: 0.24
+  hiddenYOffset: 1200
 --- !u!224 &343382444
 RectTransform:
   m_ObjectHideFlags: 0
@@ -959,6 +962,8 @@ MonoBehaviour:
   jeonghoValueText: {fileID: 0}
   tutorialCanvasGroup: {fileID: 415598808}
   tutorialCloseButton: {fileID: 377554604}
+  tutorialFadeDuration: 0.2
+  hudFadeDuration: 0.16
 --- !u!225 &415598808
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1668,8 +1673,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -90, y: 162}
-  m_SizeDelta: {x: 302.4745, y: 53.0139}
+  m_AnchoredPosition: {x: -136, y: 71}
+  m_SizeDelta: {x: 451.7657, y: 105.6855}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &825591388
 CanvasRenderer:
@@ -1699,17 +1704,19 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Seongsu <3
+  m_text: 'Nuevo mensaje de:
+
+    Seongsu <3'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b488f4105061a7341aa300ff555e7688, type: 2}
+  m_sharedMaterial: {fileID: -430092355745750653, guid: b488f4105061a7341aa300ff555e7688, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1991,6 +1998,18 @@ MonoBehaviour:
   introMonologuePauseDuration: 3
   introWakeRevealDuration: 0.7
   introMonologueCharactersPerSecond: 20
+  introTypewriterAudioMode: 0
+  introTypewriterSfx: {fileID: 8300000, guid: 9e430b29794467345af94895c5a50a1b, type: 3}
+  introTypewriterAudioSource: {fileID: 0}
+  introTypewriterVolume: 0.55
+  introTypewriterVolumeMultiplier: 1.6
+  introTypewriterSfxMinInterval: 0.045
+  introTypewriterSfxCharactersPerTick: 2
+  introTypewriterSpaceDelayMultiplier: 0.35
+  introTypewriterCommaPause: 0.075
+  introTypewriterSentencePause: 0.14
+  introTypewriterEllipsisPause: 0.22
+  introTypewriterPauseThreshold: 0.09
   introSavingLabel: Guardando...
   introChapterNumberLabel: Capitulo 1
   introChapterNameLabel: UN NUEVO COMIENZO
@@ -2037,7 +2056,9 @@ MonoBehaviour:
     angry: {fileID: 4911488125787761555, guid: 6faec700c1574024893ab23d47935276, type: 3}
     shocked: {fileID: 4911488125787761555, guid: 6faec700c1574024893ab23d47935276, type: 3}
     malicious: {fileID: 3760248595717963061, guid: 63f51781ac1279042b1807cd190cc0cd, type: 3}
-  firstPhoneNotificationSender: Seongsu <3
+  firstPhoneNotificationSender: 'Nuevo mensaje de:
+
+    Seongsu <3'
   firstPhoneNotificationBody: Andale baja, no dejare que tires tu vida a la borda.
   firstPhoneMessage: {fileID: -5649925074950309605, guid: 785c08b4e129d63449dc5f2c7ea0ebc2, type: 3}
   secondPhoneMessage: {fileID: 890870779794137618, guid: 5423ca8ab49c2dd4bb38b1cf4c408e37, type: 3}
@@ -2046,16 +2067,24 @@ MonoBehaviour:
   - {fileID: -5581528110157627460, guid: 73ec195a60f5a58459ad15215dc8f69d, type: 3}
   - {fileID: 6494219013372065826, guid: b5436975430dea64da78a91fe2898ac0, type: 3}
   jeonghoMentirosaFrameDuration: 0.13
-  musicSource: {fileID: 0}
-  sfxSource: {fileID: 0}
-  introMusic: {fileID: 0}
-  roomMusic: {fileID: 0}
-  hallwayMusic: {fileID: 0}
-  cafeteriaMusic: {fileID: 0}
-  phoneNotificationSfx: {fileID: 0}
-  roomExitSfx: {fileID: 0}
-  choiceSelectedSfx: {fileID: 0}
-  chapterCompleteSfx: {fileID: 0}
+  musicSource: {fileID: 1868175936}
+  sfxSource: {fileID: 2012690282}
+  introMusic: {fileID: 8300000, guid: 374a08c17ab8c6f4ea06f7c001060b01, type: 3}
+  roomMusic: {fileID: 8300000, guid: 374a08c17ab8c6f4ea06f7c001060b01, type: 3}
+  streetMusic: {fileID: 8300000, guid: 7277db4cf27ced3478ca4930fab2cc2a, type: 3}
+  hallwayMusic: {fileID: 8300000, guid: 0dcf78809cb4dfc47988bae62562d6d1, type: 3}
+  cafeteriaMusic: {fileID: 8300000, guid: d2f0b145db67239449dd1b1a2e09ea5c, type: 3}
+  phoneNotificationSfx: {fileID: 8300000, guid: b4f87ccb70d107a47907ac8557cc54d3, type: 3}
+  uiPopupSfx: {fileID: 8300000, guid: 4af77266b7aba6343906cd021f23085e, type: 3}
+  roomExitSfx: {fileID: 8300000, guid: 602bb68007dc6794bbd10e05ea78bfa9, type: 3}
+  choiceSelectedSfx: {fileID: 8300000, guid: 5806f9896037fda4c894ce28ba45b570, type: 3}
+  jihuunSighSfx: {fileID: 8300000, guid: 1d5944356fd188342903f3ef1cd15882, type: 3}
+  jihuunLaughSfx: {fileID: 8300000, guid: da88aff568eb89c4291a04cd40ef83dd, type: 3}
+  chapterCompleteSfx: {fileID: 8300000, guid: be2a08f54e128a8479b4de37e2e6d715, type: 3}
+  musicTransitionDuration: 0.42
+  fallbackMusicVolume: 0.45
+  streetMusicVolumeMultiplier: 1.4
+  backgroundTransitionFadeDuration: 0.24
   dayTimelapseFadeDuration: 0.5
   dayTimelapseBlackHoldDuration: 0.75
   finalPassiveEndingHoldDuration: 1.4
@@ -2253,15 +2282,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0.93410504, a: 0.8352941}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -1472270575862282810, guid: 876bee5e4854e134bbf380f5f07cd0a5, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2332,8 +2361,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -15.181, y: 63.05809}
-  m_SizeDelta: {x: 1158.0017, y: 515.7269}
+  m_AnchoredPosition: {x: -9.5767, y: 132}
+  m_SizeDelta: {x: 1454.5566, y: 639.2704}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1064335256
 MonoBehaviour:
@@ -2348,14 +2377,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.69411767}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -8822530896770157526, guid: ab4367e76c430f743a8696b60e2df416, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2543,9 +2572,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
+  m_Sprite: {fileID: 21300000, guid: 96737525da5834641a3f0bb07fb4343b, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -2578,8 +2607,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 894.7218, y: -488.96}
-  m_SizeDelta: {x: 131.9736, y: 111.7441}
+  m_AnchoredPosition: {x: 684, y: -420.17}
+  m_SizeDelta: {x: 97.3005, y: 96.576}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1166654192
 GameObject:
@@ -2765,6 +2794,7 @@ MonoBehaviour:
   promptText: {fileID: 1701247038}
   buttonContainer: {fileID: 1758199335}
   optionButtonPrefab: {fileID: 1006469693}
+  showFadeDuration: 0.18
 --- !u!224 &1299556566
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2914,8 +2944,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b488f4105061a7341aa300ff555e7688, type: 2}
+  m_sharedMaterial: {fileID: -430092355745750653, guid: b488f4105061a7341aa300ff555e7688, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3186,8 +3216,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Opci\xF3n Temporal"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b488f4105061a7341aa300ff555e7688, type: 2}
+  m_sharedMaterial: {fileID: -430092355745750653, guid: b488f4105061a7341aa300ff555e7688, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3211,8 +3241,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3348,8 +3378,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2.2959, y: -372.22086}
-  m_SizeDelta: {x: 1926.0051, y: 345.2322}
+  m_AnchoredPosition: {x: -0.000016689, y: -312}
+  m_SizeDelta: {x: 1521.3914, y: 345.2322}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1456279541
 MonoBehaviour:
@@ -3364,14 +3394,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.6462264, b: 0.9380729, a: 0.46666667}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -3340467275926015922, guid: f66c1b4582f78a1459e8a64595163c31, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3594,15 +3624,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.6313726}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -1472270575862282810, guid: 876bee5e4854e134bbf380f5f07cd0a5, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -3638,8 +3668,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 690.3395, y: -317.91626}
-  m_SizeDelta: {x: 515.6466, y: 412.7723}
+  m_AnchoredPosition: {x: 541.90137, y: -378.96738}
+  m_SizeDelta: {x: 812.5228, y: 290.6701}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1568579177
 GameObject:
@@ -3812,8 +3842,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -82.94879, y: -367.55}
-  m_SizeDelta: {x: 991.75, y: 335.89}
+  m_AnchoredPosition: {x: -38.3649, y: -343.12408}
+  m_SizeDelta: {x: 1305.1646, y: 223.3644}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1603062818
 CanvasRenderer:
@@ -3845,8 +3875,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Texto de prueba del capitulo 1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b488f4105061a7341aa300ff555e7688, type: 2}
+  m_sharedMaterial: {fileID: -430092355745750653, guid: b488f4105061a7341aa300ff555e7688, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3949,8 +3979,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -11.677696, y: 234}
-  m_SizeDelta: {x: 1087.5073, y: 110.7242}
+  m_AnchoredPosition: {x: 3.8754, y: 357.71533}
+  m_SizeDelta: {x: 1233.6, y: 98.7535}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1701247037
 CanvasRenderer:
@@ -3982,15 +4012,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Pregunta Temporal
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b488f4105061a7341aa300ff555e7688, type: 2}
+  m_sharedMaterial: {fileID: -430092355745750653, guid: b488f4105061a7341aa300ff555e7688, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4007,8 +4037,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -4086,8 +4116,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -11.677, y: -11.042799}
-  m_SizeDelta: {x: 1087.5, y: 330.7415}
+  m_AnchoredPosition: {x: -9.5768, y: 77}
+  m_SizeDelta: {x: 821.7479, y: 397.778}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1758199336
 MonoBehaviour:
@@ -4345,8 +4375,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.2093, y: -40.688305}
-  m_SizeDelta: {x: 482.89, y: 294.1303}
+  m_AnchoredPosition: {x: 149.66428, y: -32.308723}
+  m_SizeDelta: {x: 451.766, y: 172.0279}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1819900991
 CanvasRenderer:
@@ -4378,15 +4408,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Andale baja, no dejare que tires tu vida a la borda.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b488f4105061a7341aa300ff555e7688, type: 2}
+  m_sharedMaterial: {fileID: -430092355745750653, guid: b488f4105061a7341aa300ff555e7688, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4448,6 +4478,168 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &1820833783
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1820833784}
+  m_Layer: 0
+  m_Name: Audio_Chapter01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1820833784
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1820833783}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 674.34406, y: 302.28033, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1868175935}
+  - {fileID: 2012690281}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1868175934
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1868175935}
+  - component: {fileID: 1868175936}
+  m_Layer: 0
+  m_Name: Audio_BGM
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1868175935
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868175934}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1820833784}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1868175936
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868175934}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.45
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1904721860
 GameObject:
   m_ObjectHideFlags: 0
@@ -4486,8 +4678,12 @@ MonoBehaviour:
   nextButton: {fileID: 1161566565}
   charactersPerSecond: 40
   defaultSpeakerColor: {r: 1, g: 1, b: 1, a: 1}
+  captureSpeakerNameTextColorOnAwake: 1
   activePortraitColor: {r: 1, g: 1, b: 1, a: 1}
   inactivePortraitColor: {r: 1, g: 1, b: 1, a: 0.45}
+  animatePortraitEntrances: 1
+  portraitEntranceDuration: 0.22
+  portraitEntranceOffset: 160
 --- !u!224 &1904721862
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4590,8 +4786,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Capitulo 1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9696039de338e864893f12041189f98a, type: 2}
+  m_sharedMaterial: {fileID: -2277971601858067699, guid: 9696039de338e864893f12041189f98a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4677,7 +4873,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1931463544
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4797,6 +4993,135 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1931463543}
   m_CullTransparentMesh: 1
+--- !u!1 &2012690280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2012690281}
+  - component: {fileID: 2012690282}
+  m_Layer: 0
+  m_Name: Audio_SFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2012690281
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2012690280}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1820833784}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &2012690282
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2012690280}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.8
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &2013641033
 GameObject:
   m_ObjectHideFlags: 0
@@ -4837,8 +5162,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Guardando...
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9696039de338e864893f12041189f98a, type: 2}
+  m_sharedMaterial: {fileID: -2277971601858067699, guid: 9696039de338e864893f12041189f98a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5228,8 +5553,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -756, y: -238.62}
-  m_SizeDelta: {x: 330.7907, y: 78.0266}
+  m_AnchoredPosition: {x: -440, y: -174}
+  m_SizeDelta: {x: 306.8491, y: 44.5084}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2120184669
 CanvasRenderer:
@@ -5261,15 +5586,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Seongsu
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b488f4105061a7341aa300ff555e7688, type: 2}
+  m_sharedMaterial: {fileID: -430092355745750653, guid: b488f4105061a7341aa300ff555e7688, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -5286,15 +5611,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -5339,3 +5664,4 @@ SceneRoots:
   - {fileID: 905985878}
   - {fileID: 994888641}
   - {fileID: 1484936830}
+  - {fileID: 1820833784}

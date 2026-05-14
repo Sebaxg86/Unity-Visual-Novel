@@ -72,6 +72,12 @@ namespace EntreTuSilencio.Chapter01
         Completed
     }
 
+    public enum IntroTypewriterAudioMode
+    {
+        LoopWhileTyping,
+        OneShotTicks
+    }
+
     [DisallowMultipleComponent]
     public class Chapter01Director : MonoBehaviour
     {
@@ -96,18 +102,30 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private float introMonologuePauseDuration = 1.35f;
         [SerializeField] private float introWakeRevealDuration = 0.7f;
         [SerializeField] private float introMonologueCharactersPerSecond = 34f;
+        [SerializeField] private IntroTypewriterAudioMode introTypewriterAudioMode = IntroTypewriterAudioMode.LoopWhileTyping;
+        [SerializeField] private AudioClip introTypewriterSfx;
+        [SerializeField] private AudioSource introTypewriterAudioSource;
+        [SerializeField] private float introTypewriterVolume = 0.55f;
+        [SerializeField] private float introTypewriterVolumeMultiplier = 1f;
+        [SerializeField] private float introTypewriterSfxMinInterval = 0.045f;
+        [SerializeField] private int introTypewriterSfxCharactersPerTick = 2;
+        [SerializeField] private float introTypewriterSpaceDelayMultiplier = 0.35f;
+        [SerializeField] private float introTypewriterCommaPause = 0.075f;
+        [SerializeField] private float introTypewriterSentencePause = 0.14f;
+        [SerializeField] private float introTypewriterEllipsisPause = 0.22f;
+        [SerializeField] private float introTypewriterPauseThreshold = 0.09f;
 
         [TextArea(1, 2)]
         [SerializeField] private string introSavingLabel = "Guardando...";
 
         [TextArea(1, 2)]
-        [SerializeField] private string introChapterNumberLabel = "Capitulo 1";
+        [SerializeField] private string introChapterNumberLabel = "Capítulo 1";
 
         [TextArea(1, 2)]
         [SerializeField] private string introChapterNameLabel = "UN NUEVO COMIENZO";
 
         [TextArea(2, 5)]
-        [SerializeField] private string introMonologueLine1 = "Uno pensaria que con los anos la vida se haria mas sencilla, que con cada dia el peso seria mas liviano, y vivir seria menos una carga.";
+        [SerializeField] private string introMonologueLine1 = "Uno pensaría que con los años la vida se haría más sencilla, que con cada día el peso sería más liviano, y vivir sería menos una carga.";
 
         [TextArea(2, 3)]
         [SerializeField] private string introMonologueLine2 = "Pero al parecer no.";
@@ -143,7 +161,7 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private string firstPhoneNotificationSender = "Seongsu <3";
 
         [TextArea(2, 3)]
-        [SerializeField] private string firstPhoneNotificationBody = "Andale baja, no dejare que tires tu vida a la borda.";
+        [SerializeField] private string firstPhoneNotificationBody = "Ándale, baja; no dejaré que tires tu vida a la borda.";
 
         [SerializeField] private Sprite firstPhoneMessage;
         [SerializeField] private Sprite secondPhoneMessage;
@@ -157,12 +175,19 @@ namespace EntreTuSilencio.Chapter01
         [SerializeField] private AudioSource sfxSource;
         [SerializeField] private AudioClip introMusic;
         [SerializeField] private AudioClip roomMusic;
+        [SerializeField] private AudioClip streetMusic;
         [SerializeField] private AudioClip hallwayMusic;
         [SerializeField] private AudioClip cafeteriaMusic;
         [SerializeField] private AudioClip phoneNotificationSfx;
+        [SerializeField] private AudioClip uiPopupSfx;
         [SerializeField] private AudioClip roomExitSfx;
         [SerializeField] private AudioClip choiceSelectedSfx;
+        [SerializeField] private AudioClip jihuunSighSfx;
+        [SerializeField] private AudioClip jihuunLaughSfx;
         [SerializeField] private AudioClip chapterCompleteSfx;
+        [SerializeField] private float musicTransitionDuration = 0.42f;
+        [SerializeField] private float fallbackMusicVolume = 0.45f;
+        [SerializeField] private float streetMusicVolumeMultiplier = 1.4f;
 
         [Header("Canon Transitions")]
         [SerializeField] private float backgroundTransitionFadeDuration = 0.24f;
@@ -197,6 +222,10 @@ namespace EntreTuSilencio.Chapter01
         private bool hasShownTrustTutorial;
         private bool waitingForTrustTutorialClose;
         private float phonePreviewAdvanceInputUnlockTime;
+        private Coroutine musicTransitionRoutine;
+        private float cachedMusicVolume = -1f;
+        private float lastChoiceSfxPlayTime = -10f;
+        private const float ChoiceSfxDedupWindow = 0.18f;
 
         private void OnEnable()
         {
@@ -208,6 +237,7 @@ namespace EntreTuSilencio.Chapter01
 
             if (choiceController != null)
             {
+                choiceController.ChoicePressed += HandleChoicePressed;
                 choiceController.ChoiceSelected += HandleChoiceSelected;
             }
 
@@ -252,6 +282,7 @@ namespace EntreTuSilencio.Chapter01
 
             if (choiceController != null)
             {
+                choiceController.ChoicePressed -= HandleChoicePressed;
                 choiceController.ChoiceSelected -= HandleChoiceSelected;
             }
 
@@ -294,6 +325,12 @@ namespace EntreTuSilencio.Chapter01
             }
         }
 
+        private void Awake()
+        {
+            CacheMusicVolumeIfNeeded();
+            EnsureIntroTypewriterAudioSource();
+        }
+
         private void Update()
         {
             if (pendingPhonePreviewAdvance == null)
@@ -323,6 +360,8 @@ namespace EntreTuSilencio.Chapter01
             pendingTrustTutorialContinuation = null;
             hasShownTrustTutorial = false;
             waitingForTrustTutorialClose = false;
+            musicTransitionRoutine = null;
+            StopIntroTypewriterAudio();
 
             if (dialogueController != null)
             {
@@ -435,9 +474,11 @@ namespace EntreTuSilencio.Chapter01
         {
             SetCanvasGroupState(introMonologueCanvasGroup, true);
             introMonologueText.text = string.Empty;
+            StopIntroTypewriterAudio();
 
             yield return fadeOverlayController.PlayFadeFromBlack(openingFadeDuration);
             yield return TypeTextRoutine(introMonologueText, introMonologueLine1, introMonologueCharactersPerSecond);
+            StopIntroTypewriterAudio();
 
             if (introMonologuePauseDuration > 0f)
             {
@@ -446,6 +487,7 @@ namespace EntreTuSilencio.Chapter01
 
             introMonologueText.text += "\n\n";
             yield return TypeTextRoutine(introMonologueText, introMonologueLine2, introMonologueCharactersPerSecond);
+            StopIntroTypewriterAudio();
             yield return new WaitForSecondsRealtime(0.4f);
             yield return fadeOverlayController.PlayFadeToBlack(openingFadeDuration);
             SetCanvasGroupState(introMonologueCanvasGroup, false);
@@ -473,12 +515,20 @@ namespace EntreTuSilencio.Chapter01
                 yield break;
             }
 
-            float delay = 1f / charactersPerSecond;
+            int audibleCharacterCount = 0;
+            float nextTypewriterSfxTime = 0f;
+
             for (int i = 0; i < content.Length; i++)
             {
-                targetText.text += content[i];
+                char currentCharacter = content[i];
+                targetText.text += currentCharacter;
+
+                float delay = GetTypewriterDelayForCharacter(content, i, charactersPerSecond);
+                TryPlayIntroTypewriterSfx(currentCharacter, delay, ref audibleCharacterCount, ref nextTypewriterSfxTime);
                 yield return new WaitForSecondsRealtime(delay);
             }
+
+            StopIntroTypewriterAudio();
         }
 
         private void ConfigureCanonicalIntroTexts()
@@ -764,7 +814,7 @@ namespace EntreTuSilencio.Chapter01
         {
             yield return PlayBackgroundTransitionRoutine(streetBackground != null ? streetBackground : friendsBackground);
             CurrentBeat = Chapter01Beat.StreetWalk;
-            PlayMusicIfNeeded(hallwayMusic);
+            PlayMusicIfNeeded(streetMusic != null ? streetMusic : hallwayMusic);
             PlayDialogueOrContinue(GetDialogueLinesForBeat(Chapter01Beat.StreetWalk), BeginHallwayDialogue);
         }
 
@@ -968,6 +1018,8 @@ namespace EntreTuSilencio.Chapter01
 
         private void HandleDialogueLineShown(int index, DialogueLine line)
         {
+            PlayLineAccentSfx(index, line);
+
             if (trustController != null)
             {
                 if (line != null && (line.speakerMode == DialogueSpeakerMode.Thought || line.speakerMode == DialogueSpeakerMode.Narration))
@@ -994,7 +1046,10 @@ namespace EntreTuSilencio.Chapter01
 
         private void HandleChoiceSelected(ChoiceOption selectedOption)
         {
-            PlaySfx(choiceSelectedSfx);
+            if (Time.unscaledTime - lastChoiceSfxPlayTime > ChoiceSfxDedupWindow)
+            {
+                PlayChoiceSelectedSfx();
+            }
 
             if (selectedOption != null && trustController != null)
             {
@@ -1023,6 +1078,11 @@ namespace EntreTuSilencio.Chapter01
                         GetThirdChoiceEndingContinuation(selectedOption));
                     break;
             }
+        }
+
+        private void HandleChoicePressed(ChoiceOption selectedOption)
+        {
+            PlayChoiceSelectedSfx();
         }
 
         private Action GetThirdChoiceEndingContinuation(ChoiceOption selectedOption)
@@ -1124,6 +1184,7 @@ namespace EntreTuSilencio.Chapter01
                 return;
             }
 
+            PlaySfx(uiPopupSfx);
             choiceController.ShowChoice(beat.prompt, beat.options);
         }
 
@@ -1176,6 +1237,7 @@ namespace EntreTuSilencio.Chapter01
             }
 
             waitingForTrustTutorialClose = true;
+            PlaySfx(uiPopupSfx);
             trustController.ShowTutorial();
         }
 
@@ -1361,14 +1423,26 @@ namespace EntreTuSilencio.Chapter01
                 return;
             }
 
+            CacheMusicVolumeIfNeeded();
+            float targetVolume = GetTargetMusicVolume(clip);
+
             if (musicSource.clip == clip && musicSource.isPlaying)
             {
                 return;
             }
 
-            musicSource.clip = clip;
-            musicSource.loop = true;
-            musicSource.Play();
+            StopMusicTransition();
+
+            if (musicTransitionDuration <= 0f)
+            {
+                musicSource.clip = clip;
+                musicSource.loop = true;
+                musicSource.volume = targetVolume;
+                musicSource.Play();
+                return;
+            }
+
+            musicTransitionRoutine = StartCoroutine(TransitionMusicRoutine(clip));
         }
 
         private void PlaySfx(AudioClip clip)
@@ -1379,6 +1453,267 @@ namespace EntreTuSilencio.Chapter01
             }
 
             sfxSource.PlayOneShot(clip);
+        }
+
+        private void PlayChoiceSelectedSfx()
+        {
+            lastChoiceSfxPlayTime = Time.unscaledTime;
+            PlaySfx(choiceSelectedSfx);
+        }
+
+        private float GetTypewriterDelayForCharacter(string content, int characterIndex, float charactersPerSecond)
+        {
+            float baseDelay = 1f / charactersPerSecond;
+            char currentCharacter = content[characterIndex];
+
+            if (char.IsWhiteSpace(currentCharacter))
+            {
+                return baseDelay * Mathf.Max(0.05f, introTypewriterSpaceDelayMultiplier);
+            }
+
+            float delay = baseDelay;
+
+            if (currentCharacter == ',' || currentCharacter == ';' || currentCharacter == ':')
+            {
+                delay += introTypewriterCommaPause;
+            }
+            else if (IsEllipsisEnd(content, characterIndex))
+            {
+                delay += introTypewriterEllipsisPause;
+            }
+            else if (currentCharacter == '.' || currentCharacter == '!' || currentCharacter == '?')
+            {
+                delay += introTypewriterSentencePause;
+            }
+
+            return delay;
+        }
+
+        private void TryPlayIntroTypewriterSfx(
+            char currentCharacter,
+            float upcomingDelay,
+            ref int audibleCharacterCount,
+            ref float nextTypewriterSfxTime)
+        {
+            if (introTypewriterSfx == null || !IsAudibleTypewriterCharacter(currentCharacter))
+            {
+                return;
+            }
+
+            EnsureIntroTypewriterAudioSource();
+            if (introTypewriterAudioSource == null)
+            {
+                return;
+            }
+
+            if (introTypewriterAudioMode == IntroTypewriterAudioMode.LoopWhileTyping)
+            {
+                StartIntroTypewriterLoop();
+
+                if (upcomingDelay >= introTypewriterPauseThreshold)
+                {
+                    StopIntroTypewriterAudio();
+                }
+
+                return;
+            }
+
+            audibleCharacterCount++;
+
+            int safeCadence = Mathf.Max(1, introTypewriterSfxCharactersPerTick);
+            bool shouldTickOnThisCharacter = audibleCharacterCount == 1 || audibleCharacterCount % safeCadence == 0;
+            if (!shouldTickOnThisCharacter)
+            {
+                return;
+            }
+
+            if (Time.unscaledTime < nextTypewriterSfxTime || introTypewriterAudioSource.isPlaying)
+            {
+                return;
+            }
+
+            introTypewriterAudioSource.PlayOneShot(introTypewriterSfx);
+            nextTypewriterSfxTime = Time.unscaledTime + Mathf.Max(0.01f, introTypewriterSfxMinInterval);
+        }
+
+        private bool IsAudibleTypewriterCharacter(char currentCharacter)
+        {
+            return char.IsLetterOrDigit(currentCharacter);
+        }
+
+        private bool IsEllipsisEnd(string content, int characterIndex)
+        {
+            return characterIndex >= 2
+                && content[characterIndex] == '.'
+                && content[characterIndex - 1] == '.'
+                && content[characterIndex - 2] == '.';
+        }
+
+        private void EnsureIntroTypewriterAudioSource()
+        {
+            if (introTypewriterAudioSource == null)
+            {
+                introTypewriterAudioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            introTypewriterAudioSource.playOnAwake = false;
+            introTypewriterAudioSource.loop = false;
+            introTypewriterAudioSource.spatialBlend = 0f;
+            introTypewriterAudioSource.volume = GetIntroTypewriterVolume();
+        }
+
+        private void StartIntroTypewriterLoop()
+        {
+            if (introTypewriterAudioSource == null || introTypewriterSfx == null)
+            {
+                return;
+            }
+
+            introTypewriterAudioSource.volume = GetIntroTypewriterVolume();
+            introTypewriterAudioSource.loop = true;
+
+            if (introTypewriterAudioSource.clip != introTypewriterSfx)
+            {
+                introTypewriterAudioSource.clip = introTypewriterSfx;
+            }
+
+            if (!introTypewriterAudioSource.isPlaying)
+            {
+                introTypewriterAudioSource.Play();
+            }
+        }
+
+        private void StopIntroTypewriterAudio()
+        {
+            if (introTypewriterAudioSource == null)
+            {
+                return;
+            }
+
+            if (introTypewriterAudioSource.isPlaying)
+            {
+                introTypewriterAudioSource.Stop();
+            }
+
+            introTypewriterAudioSource.loop = false;
+        }
+
+        private float GetIntroTypewriterVolume()
+        {
+            float multiplier = Mathf.Max(0f, introTypewriterVolumeMultiplier);
+            return Mathf.Clamp01(introTypewriterVolume * multiplier);
+        }
+
+        private void PlayLineAccentSfx(int index, DialogueLine line)
+        {
+            if (line == null)
+            {
+                return;
+            }
+
+            if (CurrentBeat == Chapter01Beat.StreetWalk && index == 0)
+            {
+                PlaySfx(jihuunSighSfx);
+                return;
+            }
+
+            if (line.speakerMode != DialogueSpeakerMode.Narration || string.IsNullOrWhiteSpace(line.text))
+            {
+                return;
+            }
+
+            string normalizedText = line.text.Trim();
+            bool isJihuunLaughMoment =
+                normalizedText.IndexOf("Jihuun se rio", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                normalizedText.IndexOf("Jihuun se rió", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                normalizedText.IndexOf("Jihuun sonrio", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                normalizedText.IndexOf("Jihuun sonrió", StringComparison.OrdinalIgnoreCase) >= 0;
+
+            if (isJihuunLaughMoment)
+            {
+                PlaySfx(jihuunLaughSfx);
+            }
+        }
+
+        private void CacheMusicVolumeIfNeeded()
+        {
+            if (musicSource == null || cachedMusicVolume > 0f)
+            {
+                return;
+            }
+
+            cachedMusicVolume = musicSource.volume > 0.001f ? musicSource.volume : fallbackMusicVolume;
+        }
+
+        private float GetTargetMusicVolume(AudioClip clip)
+        {
+            CacheMusicVolumeIfNeeded();
+            float baseVolume = cachedMusicVolume > 0.001f ? cachedMusicVolume : fallbackMusicVolume;
+
+            if (clip != null && streetMusic != null && clip == streetMusic)
+            {
+                return Mathf.Clamp01(baseVolume * Mathf.Max(0f, streetMusicVolumeMultiplier));
+            }
+
+            return baseVolume;
+        }
+
+        private IEnumerator TransitionMusicRoutine(AudioClip nextClip)
+        {
+            if (musicSource == null || nextClip == null)
+            {
+                musicTransitionRoutine = null;
+                yield break;
+            }
+
+            float targetVolume = GetTargetMusicVolume(nextClip);
+
+            if (musicSource.isPlaying && musicSource.clip != null)
+            {
+                yield return FadeMusicVolumeRoutine(musicSource.volume, 0f, musicTransitionDuration);
+                musicSource.Stop();
+            }
+
+            musicSource.clip = nextClip;
+            musicSource.loop = true;
+            musicSource.volume = 0f;
+            musicSource.Play();
+
+            yield return FadeMusicVolumeRoutine(0f, targetVolume, musicTransitionDuration);
+            musicTransitionRoutine = null;
+        }
+
+        private IEnumerator FadeMusicVolumeRoutine(float startVolume, float endVolume, float duration)
+        {
+            if (musicSource == null)
+            {
+                yield break;
+            }
+
+            float safeDuration = duration > 0f ? duration : 0.01f;
+            float elapsed = 0f;
+
+            while (elapsed < safeDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / safeDuration);
+                float eased = Mathf.SmoothStep(0f, 1f, t);
+                musicSource.volume = Mathf.Lerp(startVolume, endVolume, eased);
+                yield return null;
+            }
+
+            musicSource.volume = endVolume;
+        }
+
+        private void StopMusicTransition()
+        {
+            if (musicTransitionRoutine == null)
+            {
+                return;
+            }
+
+            StopCoroutine(musicTransitionRoutine);
+            musicTransitionRoutine = null;
         }
 
         private void ApplyTrustHudFocusForChoice(ChoiceOption selectedOption)
@@ -1446,8 +1781,8 @@ namespace EntreTuSilencio.Chapter01
 
             return new[]
             {
-                CreateLine("Jihuun", "Por que me cuesta tanto? Lo intento, de verdad lo intento, pero siempre siento que estoy un paso atras, como si nunca pudiera alcanzar lo que se espera de mi.", DialogueSpeakerMode.Thought),
-                CreateLine("Jihuun", "No entiendo por que todo parece tan sencillo para los demas y yo sigo aqui, atrapada en mi propio ritmo.", DialogueSpeakerMode.Thought),
+                CreateLine("Jihuun", "¿Por qué me cuesta tanto? Lo intento, de verdad lo intento, pero siempre siento que estoy un paso atrás, como si nunca pudiera alcanzar lo que se espera de mí.", DialogueSpeakerMode.Thought),
+                CreateLine("Jihuun", "No entiendo por qué todo parece tan sencillo para los demás y yo sigo aquí, atrapada en mi propio ritmo.", DialogueSpeakerMode.Thought),
             };
         }
 
@@ -1465,7 +1800,7 @@ namespace EntreTuSilencio.Chapter01
 
             return new[]
             {
-                CreateLine("Jihuun", "...Supongo que no tengo otra opcion.", DialogueSpeakerMode.Thought),
+                CreateLine("Jihuun", "...Supongo que no tengo otra opción.", DialogueSpeakerMode.Thought),
             };
         }
 
@@ -1544,90 +1879,90 @@ namespace EntreTuSilencio.Chapter01
                 case Chapter01Beat.Intro:
                     return new[]
                     {
-                        CreateLine("Jihuun", "Uno pensaria que con los anos la vida se haria mas sencilla, que con cada dia el peso seria mas liviano, y vivir seria menos una carga.", DialogueSpeakerMode.Thought),
+                        CreateLine("Jihuun", "Uno pensaría que con los años la vida se haría más sencilla, que con cada día el peso sería más liviano, y vivir sería menos una carga.", DialogueSpeakerMode.Thought),
                         CreateLine("Jihuun", "Pero al parecer no.", DialogueSpeakerMode.Thought),
                     };
                 case Chapter01Beat.Room:
                     return new[]
                     {
-                        CreateLine("Jihuun", "Por que me cuesta tanto? Lo intento, de verdad lo intento, pero siempre siento que estoy un paso atras, como si nunca pudiera alcanzar lo que se espera de mi.", DialogueSpeakerMode.Thought),
-                        CreateLine("Jihuun", "No entiendo por que todo parece tan sencillo para los demas y yo sigo aqui, atrapada en mi propio ritmo.", DialogueSpeakerMode.Thought),
-                        CreateLine("Jihuun", "...Supongo que no tengo otra opcion.", DialogueSpeakerMode.Thought),
+                        CreateLine("Jihuun", "¿Por qué me cuesta tanto? Lo intento, de verdad lo intento, pero siempre siento que estoy un paso atrás, como si nunca pudiera alcanzar lo que se espera de mí.", DialogueSpeakerMode.Thought),
+                        CreateLine("Jihuun", "No entiendo por qué todo parece tan sencillo para los demás y yo sigo aquí, atrapada en mi propio ritmo.", DialogueSpeakerMode.Thought),
+                        CreateLine("Jihuun", "...Supongo que no tengo otra opción.", DialogueSpeakerMode.Thought),
                     };
                 case Chapter01Beat.RoomInspectingBonsai:
                     return new[]
                     {
-                        CreateLine("Jihuun", "El bonsai sigue aqui, impecable.", DialogueSpeakerMode.Thought),
+                        CreateLine("Jihuun", "El bonsái sigue aquí, impecable.", DialogueSpeakerMode.Thought),
                         CreateLine("Jihuun", "Cuidarlo siempre me obliga a bajar el ritmo un poco.", DialogueSpeakerMode.Thought),
                     };
                 case Chapter01Beat.RoomInspectingProteinBar:
                     return new[]
                     {
-                        CreateLine("Jihuun", "La barra de proteina sigue donde la deje.", DialogueSpeakerMode.Thought),
-                        CreateLine("Jihuun", "Tal vez deberia llevarmela. Con Seongsu nunca se sabe cuanto va a durar la salida.", DialogueSpeakerMode.Thought),
+                        CreateLine("Jihuun", "La barra de proteína sigue donde la dejé.", DialogueSpeakerMode.Thought),
+                        CreateLine("Jihuun", "Tal vez debería llevármela. Con Seongsu nunca se sabe cuánto va a durar la salida.", DialogueSpeakerMode.Thought),
                     };
                 case Chapter01Beat.Friends:
                     return new[]
                     {
-                        CreateLine("Seongsu", "Hasta que te dignas en salir! Se me iba a quemar la cabeza aqui afuera.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuUpset, null),
-                        CreateLine("Jeongho", "Ya, ya salio, no generes mas drama.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuUpset, jeonghoTenderness),
+                        CreateLine("Seongsu", "¡Hasta que te dignas a salir! Se me iba a quemar la cabeza aquí afuera.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuUpset, null),
+                        CreateLine("Jeongho", "Ya, ya salió; no generes más drama.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuUpset, jeonghoTenderness),
                         CreateLine("Jeongho", "Ya ya, ten. Se nota que lo necesitas.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuUpset, jeonghoTalking),
-                        CreateLine("Jihuun", "Una barra de proteina, muy creativo jajaja.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuUpset, jeonghoTenderness),
+                        CreateLine("Jihuun", "Una barra de proteína, muy creativo jajaja.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuUpset, jeonghoTenderness),
                     };
                 case Chapter01Beat.StreetWalk:
                     return new[]
                     {
-                        CreateLine("Jihuun", "Me alegra estar con ellos... Aqui no siento que falte algo.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                        CreateLine(string.Empty, "Estar con ellos la hacia olvidar sus problemas, aunque fuera por un rato. Eran como su pequeno refugio. Con ellos no importaba si a veces no podia hablar. No sentia que sobrara, como en otros lugares. De alguna manera, su conexion traspasaba esas barreras invisibles que tanto la frenaban.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                        CreateLine("Seongsu", "Estas bien?", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuTenderness, jeonghoTenderness),
+                        CreateLine("Jihuun", "Me alegra estar con ellos... Aquí no siento que falte algo.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                        CreateLine(string.Empty, "Estar con ellos la hacía olvidar sus problemas, aunque fuera por un rato. Eran como su pequeño refugio. Con ellos no importaba si a veces no podía hablar. No sentía que sobrara, como en otros lugares. De alguna manera, su conexión traspasaba esas barreras invisibles que tanto la frenaban.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                        CreateLine("Seongsu", "¿Estás bien?", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuTenderness, jeonghoTenderness),
                         CreateLine("Jihuun", "Estoy cansada", DialogueSpeakerMode.Signed, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
                         CreateLine("Jeongho", "Mentirosa", DialogueSpeakerMode.Signed, PortraitFocus.Right, seongsuConfused, jeonghoTalking),
                         CreateLine("Jihuun", "A veces... me siento atrapada en mi propia cabeza.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
                         CreateLine("Jeongho", "Pero te dejaremos tranquila... por ahora.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuTenderness, jeonghoTenderness),
-                        CreateLine("Jihuun", "Cada vez que alguien me pregunta por que no hablo, siento que me estoy ahogando un poco mas...", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                        CreateLine("Jihuun", "La gente no entiende lo agotador que es tener que depender siempre de los demas para comunicarme. A veces me siento atrapada en mi propia cabeza y en mis propios recuerdos.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                        CreateLine("Jihuun", "Cada vez que alguien me pregunta por qué no hablo, siento que me estoy ahogando un poco más...", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                        CreateLine("Jihuun", "La gente no entiende lo agotador que es tener que depender siempre de los demás para comunicarme. A veces me siento atrapada en mi propia cabeza y en mis propios recuerdos.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
                     };
                 case Chapter01Beat.Hallway:
                     return new[]
                     {
                         CreateLine("Jihuun", "Todos hablan...", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                        CreateLine("Jihuun", "Todos rien...", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                        CreateLine("Jihuun", "Todos ríen...", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
                         CreateLine("Jihuun", "Y yo...", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                        CreateLine("Jihuun", "Estoy aqui.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                        CreateLine("Jihuun", "Estoy aquí.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
                         CreateLine("Jihuun", "Pero no me siento presente.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
                     };
                 case Chapter01Beat.DayTransition:
                     return new[]
                     {
-                        CreateLine("Seongsu", "Ven! Vamos a la cafe.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, null),
+                        CreateLine("Seongsu", "¡Ven! Vamos a la café.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, null),
                     };
                 case Chapter01Beat.Cafeteria:
                     return new[]
                     {
-                        CreateLine(string.Empty, "La manana paso como todas las demas: clases, notas, miradas rapidas entre los companeros. Jihuun se sentia como una sombra, como si no pudiera encajar completamente, pero al mismo tiempo, no queria llamar la atencion.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuConfused, jeonghoNeutral),
-                        CreateLine("Seongsu", "Sabes que se me antoja? Un pastel de mango.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuConfused, null),
+                        CreateLine(string.Empty, "La mañana pasó como todas las demás: clases, notas, miradas rápidas entre los compañeros. Jihuun se sentía como una sombra, como si no pudiera encajar completamente, pero al mismo tiempo, no quería llamar la atención.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuConfused, jeonghoNeutral),
+                        CreateLine("Seongsu", "¿Sabes qué se me antoja? Un pastel de mango.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuConfused, null),
                         CreateLine("Jeongho", "Te tropezaste con una planta, no salvaste el mundo.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuConfused, jeonghoNeutral),
-                        CreateLine("Seongsu", "Y tu que vas a pedir?", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuConfused, jeonghoNeutral),
+                        CreateLine("Seongsu", "¿Y tú qué vas a pedir?", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuConfused, jeonghoNeutral),
                         CreateLine("Jihuun", "Jugo de durazno", DialogueSpeakerMode.Signed, PortraitFocus.None, seongsuConfused, jeonghoNeutral),
-                        CreateLine("Jeongho", "Obvio. Desde que te conozco, la mas adicta al jugo de durazno.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuConfused, jeonghoNeutral),
-                        CreateLine(string.Empty, "Seongsu sonrio con carino y fue a hacer el pedido.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoNeutral),
-                        CreateLine(string.Empty, "Jeongho saco su celular para ensenarle a Jihuun un video absurdo de un gato atrapado en una bolsa de papel.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoTalking),
-                        CreateLine(string.Empty, "Jihuun se rio bajito al verlo forcejear con la bolsa.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoHappy),
-                        CreateLine(string.Empty, "Seongsu volvio con la bandeja: dos pasteles, un cafe americano y su jugo de durazno.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuHappy, jeonghoNeutral),
-                        CreateLine("Seongsu", "Ahi tienes. Tu dosis de vida liquida.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoNeutral),
-                        CreateLine(string.Empty, "Seongsu, sin decir nada mas, partio su pastelito por la mitad y le ofrecio un pedazo a Jihuun. Como siempre, como si fuera algo que no necesitaba explicacion.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoNeutral),
-                        CreateLine(string.Empty, "El jugo de durazno estaba frio contra sus labios, un pequeno alivio bajo el sol que ya empezaba a picar en la piel. Jihuun bebia a pequenos sorbos mientras escuchaba a Jeongho hablar sobre una pelicula vieja que, segun el, era cine de culto solo porque casi nadie la conocia.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoTalking),
-                        CreateLine(string.Empty, "Seongsu, del otro lado, bufaba exageradamente y le decia que tenia gustos de senor de cincuenta anos.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuHappy, jeonghoTalking),
-                        CreateLine("Seongsu", "Apostaria a que ni siquiera tiene subtitulos.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoTalking),
-                        CreateLine("Seongsu", "Es mas, apuesto a que ni el director se acuerda que la hizo.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoTalking),
+                        CreateLine("Jeongho", "Obvio. Desde que te conozco, la más adicta al jugo de durazno.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuConfused, jeonghoNeutral),
+                        CreateLine(string.Empty, "Seongsu sonrió con cariño y fue a hacer el pedido.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoNeutral),
+                        CreateLine(string.Empty, "Jeongho sacó su celular para enseñarle a Jihuun un video absurdo de un gato atrapado en una bolsa de papel.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoTalking),
+                        CreateLine(string.Empty, "Jihuun se rió bajito al verlo forcejear con la bolsa.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoHappy),
+                        CreateLine(string.Empty, "Seongsu volvió con la bandeja: dos pasteles, un café americano y su jugo de durazno.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuHappy, jeonghoNeutral),
+                        CreateLine("Seongsu", "Ahí tienes. Tu dosis de vida líquida.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoNeutral),
+                        CreateLine(string.Empty, "Seongsu, sin decir nada más, partió su pastelito por la mitad y le ofreció un pedazo a Jihuun. Como siempre, como si fuera algo que no necesitaba explicación.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoNeutral),
+                        CreateLine(string.Empty, "El jugo de durazno estaba frío contra sus labios, un pequeño alivio bajo el sol que ya empezaba a picar en la piel. Jihuun bebía a pequeños sorbos mientras escuchaba a Jeongho hablar sobre una película vieja que, según él, era cine de culto solo porque casi nadie la conocía.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuTenderness, jeonghoTalking),
+                        CreateLine(string.Empty, "Seongsu, del otro lado, bufaba exageradamente y le decía que tenía gustos de señor de cincuenta años.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuHappy, jeonghoTalking),
+                        CreateLine("Seongsu", "Apostaría a que ni siquiera tiene subtítulos.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoTalking),
+                        CreateLine("Seongsu", "Es más, apuesto a que ni el director se acuerda de que la hizo.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoTalking),
                         CreateLine("Jihuun", "Ni yo la conozco", DialogueSpeakerMode.Signed, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                        CreateLine("Seongsu", "Ya ves? Hasta Jihuun lo dice, y ella es la mas cool de nosotros.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoHappy),
-                        CreateLine("Jihuun", "Aqui... es facil. No necesito hablar.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                        CreateLine("Seongsu", "¿Ya ves? Hasta Jihuun lo dice, y ella es la más cool de nosotros.", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoHappy),
+                        CreateLine("Jihuun", "Aquí... es fácil. No necesito hablar.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
                     };
                 case Chapter01Beat.Ending:
                     return new[]
                     {
-                        CreateLine(string.Empty, "Capitulo 1 terminado.", DialogueSpeakerMode.Narration),
+                        CreateLine(string.Empty, "Capítulo 1 terminado.", DialogueSpeakerMode.Narration),
                     };
                 default:
                     return null;
@@ -1641,18 +1976,18 @@ namespace EntreTuSilencio.Chapter01
                 case Chapter01Beat.FirstChoice:
                     return new ChapterChoiceBeat
                     {
-                        prompt = "Como reacciona Jihuun al ver a sus amigos?",
+                        prompt = "¿Cómo reacciona Jihuun al ver a sus amigos?",
                         options = new[]
                         {
-                            CreateChoice("smile_softly", "Sonrie ligeramente", 1, 1),
+                            CreateChoice("smile_softly", "Sonríe ligeramente", 1, 1),
                             CreateChoice("just_watch", "Solo observa", 0, 0),
-                            CreateChoice("sign_to_jeongho", "Hace una sena a Jeongho", 0, 1),
+                            CreateChoice("sign_to_jeongho", "Hace una seña a Jeongho", 0, 1),
                         }
                     };
                 case Chapter01Beat.SecondChoice:
                     return new ChapterChoiceBeat
                     {
-                        prompt = "Como procesa Jihuun el ruido del pasillo?",
+                        prompt = "¿Cómo procesa Jihuun el ruido del pasillo?",
                         options = new[]
                         {
                             CreateChoice("look_around", "Mirar a la gente", 0, 0),
@@ -1663,7 +1998,7 @@ namespace EntreTuSilencio.Chapter01
                 case Chapter01Beat.ThirdChoice:
                     return new ChapterChoiceBeat
                     {
-                        prompt = "Como participa Jihuun en la conversacion?",
+                        prompt = "¿Cómo participa Jihuun en la conversación?",
                         options = new[]
                         {
                             CreateChoice("propose_weekend_plan", "Propone idea de salir el fin de semana", 1, 1),
@@ -1694,7 +2029,7 @@ namespace EntreTuSilencio.Chapter01
                     {
                         return new[]
                         {
-                            CreateLine("Jihuun", "Ya lo tenias preparado?", DialogueSpeakerMode.Signed, PortraitFocus.None, seongsuTenderness, jeonghoTalking),
+                            CreateLine("Jihuun", "¿Ya lo tenías preparado?", DialogueSpeakerMode.Signed, PortraitFocus.None, seongsuTenderness, jeonghoTalking),
                             CreateLine("Jeongho", "Para que veas jajaja, era predecible.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuTenderness, jeonghoHappy),
                         };
                     }
@@ -1708,14 +2043,14 @@ namespace EntreTuSilencio.Chapter01
                             return new[]
                             {
                                 CreateLine("Jihuun", "Levanto la mirada.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
-                                CreateLine("Jihuun", "Por un segundo, todo se vuelve mas claro. Rostros. Movimiento. Ruido. Demasiado.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
-                                CreateLine("Jihuun", "Y entonces... alguien me esta mirando. No es como los demas. No se aparta de inmediato.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine("Jihuun", "Por un segundo, todo se vuelve más claro. Rostros. Movimiento. Ruido. Demasiado.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine("Jihuun", "Y entonces... alguien me está mirando. No es como los demás. No se aparta de inmediato.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
                             };
                         case "look_down":
                             return new[]
                             {
                                 CreateLine("Jihuun", "Bajo la mirada.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
-                                CreateLine("Jihuun", "Es mas facil asi. Nadie se detiene. Nadie pregunta. Solo pasos y ruido.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
+                                CreateLine("Jihuun", "Es más fácil así. Nadie se detiene. Nadie pregunta. Solo pasos y ruido.", DialogueSpeakerMode.Thought, PortraitFocus.None, leftPortrait, rightPortrait),
                             };
                         case "ignore_everything":
                             return new[]
@@ -1733,42 +2068,42 @@ namespace EntreTuSilencio.Chapter01
                             return new[]
                             {
                                 CreateLine("Jihuun", "Levanto las manos antes de pensarlo demasiado.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Jihuun", "Hago la sena torpemente... pero suficiente.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Jihuun", "No estoy segura de si lo entenderan.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Seongsu", "Burbujas?! Me encanta!", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jeongho", "Ok, eso si no me lo esperaba.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuHappy, jeonghoHappy),
-                                CreateLine(string.Empty, "Jihuun se rio bajito.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "Hago la seña torpemente... pero suficiente.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Jihuun", "No estoy segura de si lo entenderán.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Seongsu", "¡¿Burbujas?! ¡Me encanta!", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jeongho", "Ok, eso sí no me lo esperaba.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuHappy, jeonghoHappy),
+                                CreateLine(string.Empty, "Jihuun se rió bajito.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuHappy, jeonghoHappy),
                                 CreateLine("Jihuun", "Alguien me estaba mirando otra vez.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "Levante la vista, y ahi estaba el.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "Ese chico que siempre parecia estar en el lugar correcto para hacerme sentir incomoda.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "No era que el hiciera algo malo. No era como los otros que se reian o susurraban. Su mirada era distinta, como de curiosidad, pero igual de pesada. No me gustaba ser observada asi. No me gustaba sentirme un bicho raro en exhibicion.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "Baje la cabeza rapidamente, reprimiendo el impulso de fruncir el ceno.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "No era su culpa. Solo estaba... curioso. Quiza.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "Levanté la vista, y ahí estaba él.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "Ese chico que siempre parecía estar en el lugar correcto para hacerme sentir incómoda.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "No era que él hiciera algo malo. No era como los otros que se reían o susurraban. Su mirada era distinta, como de curiosidad, pero igual de pesada. No me gustaba ser observada así. No me gustaba sentirme un bicho raro en exhibición.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "Bajé la cabeza rápidamente, reprimiendo el impulso de fruncir el ceño.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "No era su culpa. Solo estaba... curioso. Quizá.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
                             };
                         case "just_watch_again":
                             return new[]
                             {
                                 CreateLine("Jihuun", "Alguien me estaba mirando otra vez.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Jihuun", "Levante la vista, y ahi estaba el.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Jihuun", "Ese chico que siempre parecia estar en el lugar correcto para hacerme sentir incomoda.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Jihuun", "No era que el hiciera algo malo. No era como los otros que se reian o susurraban. Su mirada era distinta, como de curiosidad, pero igual de pesada. No me gustaba ser observada asi. No me gustaba sentirme un bicho raro en exhibicion.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Jihuun", "Baje la cabeza rapidamente, reprimiendo el impulso de fruncir el ceno.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Jihuun", "No era su culpa. Solo estaba... curioso. Quiza.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Jihuun", "Levanté la vista, y ahí estaba él.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Jihuun", "Ese chico que siempre parecía estar en el lugar correcto para hacerme sentir incómoda.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Jihuun", "No era que él hiciera algo malo. No era como los otros que se reían o susurraban. Su mirada era distinta, como de curiosidad, pero igual de pesada. No me gustaba ser observada así. No me gustaba sentirme un bicho raro en exhibición.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Jihuun", "Bajé la cabeza rápidamente, reprimiendo el impulso de fruncir el ceño.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Jihuun", "No era su culpa. Solo estaba... curioso. Quizá.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
                             };
                         case "write_on_phone":
                             return new[]
                             {
-                                CreateLine("Jihuun", "Escribo rapido en el celular y les enseno la pantalla.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Jihuun", "No estoy segura de si sonara ridiculo.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
-                                CreateLine("Seongsu", "Burbujas?! Me encanta!", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jeongho", "Ok, eso si no me lo esperaba.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuHappy, jeonghoHappy),
-                                CreateLine(string.Empty, "Jihuun sonrio sin querer.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "Escribo rápido en el celular y les enseño la pantalla.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Jihuun", "No estoy segura de si sonará ridículo.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuTenderness, jeonghoTenderness),
+                                CreateLine("Seongsu", "¡¿Burbujas?! ¡Me encanta!", DialogueSpeakerMode.Spoken, PortraitFocus.Left, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jeongho", "Ok, eso sí no me lo esperaba.", DialogueSpeakerMode.Spoken, PortraitFocus.Right, seongsuHappy, jeonghoHappy),
+                                CreateLine(string.Empty, "Jihuun sonrió sin querer.", DialogueSpeakerMode.Narration, PortraitFocus.None, seongsuHappy, jeonghoHappy),
                                 CreateLine("Jihuun", "Alguien me estaba mirando otra vez.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "Levante la vista, y ahi estaba el.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "Ese chico que siempre parecia estar en el lugar correcto para hacerme sentir incomoda.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "No era que el hiciera algo malo. No era como los otros que se reian o susurraban. Su mirada era distinta, como de curiosidad, pero igual de pesada. No me gustaba ser observada asi. No me gustaba sentirme un bicho raro en exhibicion.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "Baje la cabeza rapidamente, reprimiendo el impulso de fruncir el ceno.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
-                                CreateLine("Jihuun", "No era su culpa. Solo estaba... curioso. Quiza.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "Levanté la vista, y ahí estaba él.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "Ese chico que siempre parecía estar en el lugar correcto para hacerme sentir incómoda.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "No era que él hiciera algo malo. No era como los otros que se reían o susurraban. Su mirada era distinta, como de curiosidad, pero igual de pesada. No me gustaba ser observada así. No me gustaba sentirme un bicho raro en exhibición.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "Bajé la cabeza rápidamente, reprimiendo el impulso de fruncir el ceño.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
+                                CreateLine("Jihuun", "No era su culpa. Solo estaba... curioso. Quizá.", DialogueSpeakerMode.Thought, PortraitFocus.None, seongsuHappy, jeonghoHappy),
                             };
                     }
 

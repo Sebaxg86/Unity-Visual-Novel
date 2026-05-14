@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace EntreTuSilencio.Dialogue
@@ -20,6 +21,7 @@ namespace EntreTuSilencio.Dialogue
         private Coroutine visibilityRoutine;
 
         public event Action<ChoiceOption> ChoiceSelected;
+        public event Action<ChoiceOption> ChoicePressed;
 
         private void Awake()
         {
@@ -64,6 +66,7 @@ namespace EntreTuSilencio.Dialogue
                     label.text = option.label;
                 }
 
+                ConfigurePointerDownTrigger(button, option);
                 button.onClick.AddListener(() => HandleSelection(option));
                 spawnedButtons.Add(button);
             }
@@ -89,6 +92,33 @@ namespace EntreTuSilencio.Dialogue
         {
             ChoiceSelected?.Invoke(option);
             Hide();
+        }
+
+        private void ConfigurePointerDownTrigger(Button button, ChoiceOption option)
+        {
+            if (button == null)
+            {
+                return;
+            }
+
+            EventTrigger trigger = button.GetComponent<EventTrigger>();
+            if (trigger == null)
+            {
+                trigger = button.gameObject.AddComponent<EventTrigger>();
+            }
+
+            if (trigger.triggers == null)
+            {
+                trigger.triggers = new List<EventTrigger.Entry>();
+            }
+
+            EventTrigger.Entry pointerDownEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerDown
+            };
+
+            pointerDownEntry.callback.AddListener(_ => ChoicePressed?.Invoke(option));
+            trigger.triggers.Add(pointerDownEntry);
         }
 
         private void ClearButtons()

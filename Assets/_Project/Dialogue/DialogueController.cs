@@ -18,6 +18,7 @@ namespace EntreTuSilencio.Dialogue
         [SerializeField] private Button nextButton;
         [SerializeField] private float charactersPerSecond = 40f;
         [SerializeField] private Color defaultSpeakerColor = Color.white;
+        [SerializeField] private bool captureSpeakerNameTextColorOnAwake = true;
         [SerializeField] private Color activePortraitColor = Color.white;
         [SerializeField] private Color inactivePortraitColor = new Color(1f, 1f, 1f, 0.45f);
         [SerializeField] private bool animatePortraitEntrances = true;
@@ -49,6 +50,11 @@ namespace EntreTuSilencio.Dialogue
             if (rootCanvasGroup == null)
             {
                 rootCanvasGroup = GetComponent<CanvasGroup>();
+            }
+
+            if (captureSpeakerNameTextColorOnAwake && speakerNameText != null)
+            {
+                defaultSpeakerColor = speakerNameText.color;
             }
 
             leftPortraitDefaultPosition = GetPortraitAnchoredPosition(leftPortraitImage);
